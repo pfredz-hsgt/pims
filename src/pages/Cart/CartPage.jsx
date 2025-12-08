@@ -10,18 +10,18 @@ import {
     Spin,
     message,
     Modal,
-    InputNumber,
+    Input,
     Popconfirm,
 } from 'antd';
 import {
     DeleteOutlined,
-    EditOutlined,
     FilePdfOutlined,
     CheckCircleOutlined,
     EnvironmentOutlined,
     FileExcelOutlined,
 } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
+import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -34,7 +34,7 @@ const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [groupedItems, setGroupedItems] = useState({});
     const [editingItem, setEditingItem] = useState(null);
-    const [editQuantity, setEditQuantity] = useState(1);
+    const [editQuantity, setEditQuantity] = useState('');
 
     useEffect(() => {
         fetchCartItems();
@@ -133,11 +133,11 @@ const CartPage = () => {
 
             if (error) throw error;
 
-            message.success('Indent approved successfully!');
+            message.success('Indent cleared successfully!');
             fetchCartItems();
         } catch (error) {
-            console.error('Error approving indent:', error);
-            message.error('Failed to approve indent');
+            console.error('Error clearing indent:', error);
+            message.error('Failed to clear indent');
         }
     };
 
@@ -312,69 +312,45 @@ const CartPage = () => {
         }
     };
 
-    const getSourceColor = (source) => {
-        const colors = {
-            'IPD': 'blue',
-            'OPD': 'green',
-            'MFG': 'orange',
-        };
-        return colors[source] || 'default';
-    };
-
-    const getTypeColor = (type) => {
-        const colors = {
-            'Tablet': 'blue',
-            'Injection': 'red',
-            'Syrup': 'purple',
-            'Eye Drops': 'cyan',
-            'Ear Drops': 'green',
-            'Others': 'default',
-        };
-        return colors[type] || 'default';
-    };
-
     const renderItemActions = (item) => [
-        <Button
-            key="edit"
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(item)}
-        >
-            <span className="action-text">Edit</span>
-        </Button>,
         <Popconfirm
             key="delete"
             title="Remove this item from cart?"
-            onConfirm={() => handleDelete(item.id)}
+            onConfirm={(e) => {
+                e?.stopPropagation();
+                handleDelete(item.id);
+            }}
             okText="Yes"
             cancelText="No"
+            onCancel={(e) => e?.stopPropagation()}
         >
-            <Button type="link" danger icon={<DeleteOutlined />}>
-                <span className="action-text">Delete</span>
-            </Button>
+            <Button
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={(e) => e.stopPropagation()}
+            />
         </Popconfirm>,
     ];
 
     const renderMobileActions = (item) => (
-        <Space size="small">
+        <Popconfirm
+            title="Remove?"
+            onConfirm={(e) => {
+                e?.stopPropagation();
+                handleDelete(item.id);
+            }}
+            okText="Yes"
+            cancelText="No"
+            onCancel={(e) => e?.stopPropagation()}
+        >
             <Button
                 size="small"
-                icon={<EditOutlined />}
-                onClick={() => handleEdit(item)}
+                danger
+                icon={<DeleteOutlined />}
+                onClick={(e) => e.stopPropagation()}
             />
-            <Popconfirm
-                title="Remove?"
-                onConfirm={() => handleDelete(item.id)}
-                okText="Yes"
-                cancelText="No"
-            >
-                <Button
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                />
-            </Popconfirm>
-        </Space>
+        </Popconfirm>
     );
 
     if (loading) {
@@ -466,7 +442,8 @@ const CartPage = () => {
                                         renderItem={(item) => (
                                             <List.Item
                                                 actions={window.innerWidth > 768 ? renderItemActions(item) : undefined}
-                                                style={{ flexWrap: 'wrap' }}
+                                                style={{ flexWrap: 'wrap', cursor: 'pointer' }}
+                                                onClick={() => handleEdit(item)}
                                             >
                                                 <List.Item.Meta
                                                     title={
@@ -486,11 +463,6 @@ const CartPage = () => {
                                                                 </Text>
                                                             </Space>
                                                             <Text>Quantity: <Text strong>{item.requested_qty}</Text></Text>
-                                                            {item.inventory_items?.remarks && (
-                                                                <Text type="secondary" style={{ fontSize: '12px' }}>
-                                                                    {item.inventory_items.remarks}
-                                                                </Text>
-                                                            )}
                                                         </Space>
                                                     }
                                                 />
@@ -517,11 +489,11 @@ const CartPage = () => {
             >
                 <Space direction="vertical" style={{ width: '100%' }}>
                     <Text>Update quantity for: <Text strong>{editingItem?.inventory_items?.name}</Text></Text>
-                    <InputNumber
-                        min={1}
+                    <Input
                         value={editQuantity}
-                        onChange={setEditQuantity}
+                        onChange={(e) => setEditQuantity(e.target.value)}
                         style={{ width: '100%' }}
+                        placeholder="e.g., 10, 5x30's, 2 boxes"
                     />
                 </Space>
             </Modal>

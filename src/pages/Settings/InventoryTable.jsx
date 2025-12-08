@@ -142,12 +142,14 @@ const InventoryTable = () => {
             dataIndex: 'type',
             key: 'type',
             filters: [
-                { text: 'Tablet', value: 'Tablet' },
+                { text: 'OPD', value: 'OPD' },
+                { text: 'Eye/Ear/Nose/Inh', value: 'Eye/Ear/Nose/Inh' },
+                { text: 'DDA', value: 'DDA' },
+                { text: 'External', value: 'External' },
                 { text: 'Injection', value: 'Injection' },
                 { text: 'Syrup', value: 'Syrup' },
-                { text: 'Eye Drops', value: 'Eye Drops' },
-                { text: 'Ear Drops', value: 'Ear Drops' },
                 { text: 'Others', value: 'Others' },
+                { text: 'UOD', value: 'UOD' },
             ],
             onFilter: (value, record) => record.type === value,
             width: 120,
@@ -176,9 +178,13 @@ const InventoryTable = () => {
             dataIndex: 'indent_source',
             key: 'indent_source',
             filters: [
-                { text: 'IPD', value: 'IPD' },
-                { text: 'OPD', value: 'OPD' },
-                { text: 'MFG', value: 'MFG' },
+                { text: 'OPD Counter', value: 'OPD Counter' },
+                { text: 'OPD Substore', value: 'OPD Substore' },
+                { text: 'IPD Counter', value: 'IPD Counter' },
+                { text: 'MNF Substor', value: 'MNF Substor' },
+                { text: 'Manufact', value: 'Manufact' },
+                { text: 'Prepacking', value: 'Prepacking' },
+                { text: 'IPD Substore', value: 'IPD Substore' },
             ],
             onFilter: (value, record) => record.indent_source === value,
             width: 80,
@@ -272,12 +278,14 @@ const InventoryTable = () => {
                         rules={[{ required: true, message: 'Please select type' }]}
                     >
                         <Select placeholder="Select drug type">
-                            <Select.Option value="Tablet">Tablet</Select.Option>
+                            <Select.Option value="OPD">OPD</Select.Option>
+                            <Select.Option value="Eye/Ear/Nose/Inh">Eye/Ear/Nose/Inh</Select.Option>
+                            <Select.Option value="DDA">DDA</Select.Option>
+                            <Select.Option value="External">External</Select.Option>
                             <Select.Option value="Injection">Injection</Select.Option>
                             <Select.Option value="Syrup">Syrup</Select.Option>
-                            <Select.Option value="Eye Drops">Eye Drops</Select.Option>
-                            <Select.Option value="Ear Drops">Ear Drops</Select.Option>
                             <Select.Option value="Others">Others</Select.Option>
+                            <Select.Option value="UOD">UOD</Select.Option>
                         </Select>
                     </Form.Item>
 
@@ -319,9 +327,13 @@ const InventoryTable = () => {
 
                     <Form.Item name="indent_source" label="Indent Source">
                         <Select placeholder="Select source">
-                            <Select.Option value="IPD">IPD</Select.Option>
-                            <Select.Option value="OPD">OPD</Select.Option>
-                            <Select.Option value="MFG">MFG</Select.Option>
+                            <Select.Option value="OPD Counter">OPD Counter</Select.Option>
+                            <Select.Option value="OPD Substore">OPD Substore</Select.Option>
+                            <Select.Option value="IPD Counter">IPD Counter</Select.Option>
+                            <Select.Option value="MNF Substor">MNF Substor</Select.Option>
+                            <Select.Option value="Manufact">Manufact</Select.Option>
+                            <Select.Option value="Prepacking">Prepacking</Select.Option>
+                            <Select.Option value="IPD Substore">IPD Substore</Select.Option>
                         </Select>
                     </Form.Item>
 

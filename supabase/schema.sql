@@ -9,14 +9,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS inventory_items (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
-  type TEXT CHECK (type IN ('Tablet', 'Injection', 'Syrup', 'Eye Drops', 'Ear Drops', 'Others')),
+  type TEXT CHECK (type IN ('OPD', 'Eye/Ear/Nose/Inh', 'DDA', 'External', 'Injection', 'Syrup', 'Others', 'UOD')),
   section TEXT NOT NULL,
   row TEXT NOT NULL,
   bin TEXT NOT NULL,
   location_code TEXT GENERATED ALWAYS AS (section || '-' || row || '-' || bin) STORED,
   min_qty INTEGER DEFAULT 0,
   max_qty INTEGER,
-  indent_source TEXT CHECK (indent_source IN ('IPD', 'OPD', 'MFG')),
+  indent_source TEXT CHECK (indent_source IN ('OPD Counter', 'OPD Substore', 'IPD Counter', 'MNF Substor', 'Manufact', 'Prepacking', 'IPD Substore')),
   remarks TEXT,
   image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
 CREATE TABLE IF NOT EXISTS indent_requests (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   item_id UUID REFERENCES inventory_items(id) ON DELETE CASCADE,
-  requested_qty INTEGER NOT NULL,
+  requested_qty TEXT NOT NULL,
   status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Completed')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

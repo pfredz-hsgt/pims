@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     Modal,
     Form,
-    InputNumber,
+    Input,
     Radio,
     Space,
     Typography,
@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
+import { getTypeColor } from '../../lib/colorMappings';
 
 const { Title, Text } = Typography;
 
@@ -43,18 +44,6 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const getTypeColor = (type) => {
-        const colors = {
-            'Tablet': 'blue',
-            'Injection': 'red',
-            'Syrup': 'purple',
-            'Eye Drops': 'cyan',
-            'Ear Drops': 'green',
-            'Others': 'default',
-        };
-        return colors[type] || 'default';
     };
 
     return (
@@ -105,7 +94,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                     layout="vertical"
                     onFinish={handleSubmit}
                     initialValues={{
-                        quantity: 1,
+                        quantity: '',
                     }}
                 >
                     <Form.Item
@@ -113,13 +102,11 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                         label="Quantity"
                         rules={[
                             { required: true, message: 'Please enter quantity' },
-                            { type: 'number', min: 1, message: 'Quantity must be at least 1' },
                         ]}
                     >
-                        <InputNumber
+                        <Input
                             style={{ width: '100%' }}
-                            min={1}
-                            placeholder="Enter quantity"
+                            placeholder="e.g., 10, 5x30's, 2 boxes"
                         />
                     </Form.Item>
 

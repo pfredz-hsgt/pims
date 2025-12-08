@@ -19,6 +19,7 @@ import {
     EnvironmentOutlined,
 } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
+import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
 import DrugCard from '../../components/DrugCard';
 import DrugDetailModal from './DrugDetailModal';
 
@@ -81,27 +82,6 @@ const LocatorPage = () => {
     const handleDrugClick = (drug) => {
         setSelectedDrug(drug);
         setModalVisible(true);
-    };
-
-    const getTypeColor = (type) => {
-        const colors = {
-            'Tablet': 'blue',
-            'Injection': 'red',
-            'Syrup': 'purple',
-            'Eye Drops': 'cyan',
-            'Ear Drops': 'green',
-            'Others': 'default',
-        };
-        return colors[type] || 'default';
-    };
-
-    const getSourceColor = (source) => {
-        const colors = {
-            'IPD': 'blue',
-            'OPD': 'green',
-            'MFG': 'orange',
-        };
-        return colors[source] || 'default';
     };
 
     return (

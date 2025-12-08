@@ -1,32 +1,12 @@
 import React from 'react';
-import { Modal, Typography, Tag, Space, Image, Descriptions } from 'antd';
+import { Modal, Descriptions, Tag, Typography, Space, Image } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
+import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
 
 const { Title, Text } = Typography;
 
 const DrugDetailModal = ({ drug, visible, onClose }) => {
     if (!drug) return null;
-
-    const getTypeColor = (type) => {
-        const colors = {
-            'Tablet': 'blue',
-            'Injection': 'red',
-            'Syrup': 'purple',
-            'Eye Drops': 'cyan',
-            'Ear Drops': 'green',
-            'Others': 'default',
-        };
-        return colors[type] || 'default';
-    };
-
-    const getSourceColor = (source) => {
-        const colors = {
-            'IPD': 'blue',
-            'OPD': 'green',
-            'MFG': 'orange',
-        };
-        return colors[source] || 'default';
-    };
 
     return (
         <Modal

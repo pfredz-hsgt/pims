@@ -1,30 +1,11 @@
 import React from 'react';
 import { Card, Tag, Typography } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
+import { getTypeColor, getSourceColor } from '../lib/colorMappings';
 
 const { Text } = Typography;
 
 const DrugCard = ({ drug, onClick }) => {
-    const getTypeColor = (type) => {
-        const colors = {
-            'Tablet': 'blue',
-            'Injection': 'red',
-            'Syrup': 'purple',
-            'Eye Drops': 'cyan',
-            'Ear Drops': 'green',
-            'Others': 'default',
-        };
-        return colors[type] || 'default';
-    };
-
-    const getSourceColor = (source) => {
-        const colors = {
-            'IPD': 'blue',
-            'OPD': 'green',
-            'MFG': 'orange',
-        };
-        return colors[source] || 'default';
-    };
 
     return (
         <Card
