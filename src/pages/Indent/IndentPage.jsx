@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     Row,
     Col,
@@ -8,6 +8,7 @@ import {
     Button,
     Typography,
     message,
+    Pagination,
 } from 'antd';
 import { supabase } from '../../lib/supabase';
 import DrugCard from '../../components/DrugCard';
@@ -17,21 +18,23 @@ const { Title, Text } = Typography;
 
 const IndentPage = () => {
     const [drugs, setDrugs] = useState([]);
-    const [filteredDrugs, setFilteredDrugs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedSection, setSelectedSection] = useState('ALL');
     const [selectedDrug, setSelectedDrug] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [sections, setSections] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(24);
 
     useEffect(() => {
         fetchDrugs();
         setupRealtimeSubscription();
     }, []);
 
+    // Reset to first page when section changes
     useEffect(() => {
-        filterBySection();
-    }, [selectedSection, drugs]);
+        setCurrentPage(1);
+    }, [selectedSection]);
 
     const fetchDrugs = async () => {
         try {
@@ -50,8 +53,6 @@ const IndentPage = () => {
             // Extract unique sections
             const uniqueSections = [...new Set(data.map(d => d.section))].sort();
             setSections(uniqueSections);
-
-            setFilteredDrugs(data || []);
         } catch (error) {
             console.error('Error fetching drugs:', error);
             message.error('Failed to load inventory items');
@@ -82,23 +83,39 @@ const IndentPage = () => {
         };
     };
 
-    const filterBySection = () => {
+    // Memoize filtered drugs to prevent unnecessary recalculations
+    const filteredDrugs = useMemo(() => {
         if (selectedSection === 'ALL') {
-            setFilteredDrugs(drugs);
-        } else {
-            setFilteredDrugs(drugs.filter(drug => drug.section === selectedSection));
+            return drugs;
         }
-    };
+        return drugs.filter(drug => drug.section === selectedSection);
+    }, [selectedSection, drugs]);
 
-    const handleDrugClick = (drug) => {
+    // Memoize paginated drugs
+    const paginatedDrugs = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        return filteredDrugs.slice(startIndex, endIndex);
+    }, [filteredDrugs, currentPage, pageSize]);
+
+    // Use useCallback to prevent unnecessary re-renders
+    const handleDrugClick = useCallback((drug) => {
         setSelectedDrug(drug);
         setModalVisible(true);
-    };
+    }, []);
 
-    const handleIndentSuccess = () => {
+    const handlePageChange = useCallback((page, newPageSize) => {
+        setCurrentPage(page);
+        if (newPageSize !== pageSize) {
+            setPageSize(newPageSize);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [pageSize]);
+
+    const handleIndentSuccess = useCallback(() => {
         setModalVisible(false);
         message.success('Item added to cart successfully!');
-    };
+    }, []);
 
     return (
         <div>
@@ -156,13 +173,27 @@ const IndentPage = () => {
 
                 {/* Drug Grid */}
                 {!loading && filteredDrugs.length > 0 && (
-                    <Row gutter={[16, 16]}>
-                        {filteredDrugs.map((drug) => (
-                            <Col xs={24} sm={12} md={8} lg={6} key={drug.id}>
-                                <DrugCard drug={drug} onClick={() => handleDrugClick(drug)} />
-                            </Col>
-                        ))}
-                    </Row>
+                    <>
+                        <Row gutter={[16, 16]}>
+                            {paginatedDrugs.map((drug) => (
+                                <Col xs={24} sm={12} md={8} lg={6} key={drug.id}>
+                                    <DrugCard drug={drug} onClick={() => handleDrugClick(drug)} />
+                                </Col>
+                            ))}
+                        </Row>
+                        <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
+                            <Pagination
+                                current={currentPage}
+                                total={filteredDrugs.length}
+                                pageSize={pageSize}
+                                onChange={handlePageChange}
+                                onShowSizeChange={handlePageChange}
+                                showSizeChanger
+                                showTotal={(total) => `Total ${total} items`}
+                                pageSizeOptions={['12', '24', '48', '96']}
+                            />
+                        </div>
+                    </>
                 )}
             </Space>
 

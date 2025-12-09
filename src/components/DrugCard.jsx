@@ -31,7 +31,7 @@ const DrugCard = ({ drug, onClick }) => {
                             fontWeight: 'bold',
                         }}
                     >
-                        {drug.name.charAt(0)}
+                        {drug.location_code ? drug.location_code.split('-').slice(0, 2).join('-') : drug.name.charAt(0)}
                     </div>
                 )
             }

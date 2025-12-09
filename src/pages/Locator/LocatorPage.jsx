@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     Input,
     Row,
@@ -11,6 +11,7 @@ import {
     Typography,
     Tag,
     message,
+    Pagination,
 } from 'antd';
 import {
     SearchOutlined,
@@ -27,20 +28,28 @@ const { Title, Text } = Typography;
 
 const LocatorPage = () => {
     const [drugs, setDrugs] = useState([]);
-    const [filteredDrugs, setFilteredDrugs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
     const [selectedDrug, setSelectedDrug] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(24);
 
     useEffect(() => {
         fetchDrugs();
     }, []);
 
+    // Debounce search query to reduce filtering operations
     useEffect(() => {
-        filterDrugs();
-    }, [searchQuery, drugs]);
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+            setCurrentPage(1); // Reset to first page on new search
+        }, 300); // 300ms delay
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     const fetchDrugs = async () => {
         try {
@@ -53,7 +62,6 @@ const LocatorPage = () => {
             if (error) throw error;
 
             setDrugs(data || []);
-            setFilteredDrugs(data || []);
         } catch (error) {
             console.error('Error fetching drugs:', error);
             message.error('Failed to load inventory items');
@@ -62,27 +70,42 @@ const LocatorPage = () => {
         }
     };
 
-    const filterDrugs = () => {
-        if (!searchQuery.trim()) {
-            setFilteredDrugs(drugs);
-            return;
+    // Memoize filtered drugs to prevent unnecessary recalculations
+    const filteredDrugs = useMemo(() => {
+        if (!debouncedSearchQuery.trim()) {
+            return drugs;
         }
 
-        const query = searchQuery.toLowerCase();
-        const filtered = drugs.filter(
+        const query = debouncedSearchQuery.toLowerCase();
+        return drugs.filter(
             (drug) =>
                 drug.name.toLowerCase().includes(query) ||
                 drug.type?.toLowerCase().includes(query) ||
                 drug.location_code?.toLowerCase().includes(query) ||
                 drug.remarks?.toLowerCase().includes(query)
         );
-        setFilteredDrugs(filtered);
-    };
+    }, [debouncedSearchQuery, drugs]);
 
-    const handleDrugClick = (drug) => {
+    // Memoize paginated drugs for grid view
+    const paginatedDrugs = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        return filteredDrugs.slice(startIndex, endIndex);
+    }, [filteredDrugs, currentPage, pageSize]);
+
+    // Use useCallback to prevent unnecessary re-renders
+    const handleDrugClick = useCallback((drug) => {
         setSelectedDrug(drug);
         setModalVisible(true);
-    };
+    }, []);
+
+    const handlePageChange = useCallback((page, newPageSize) => {
+        setCurrentPage(page);
+        if (newPageSize !== pageSize) {
+            setPageSize(newPageSize);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [pageSize]);
 
     return (
         <div>
@@ -96,13 +119,13 @@ const LocatorPage = () => {
                 </div>
 
                 {/* Search and View Toggle */}
-                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
                     <Input
                         placeholder="Search by name, type, location, or remarks..."
                         prefix={<SearchOutlined />}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ width: 400, maxWidth: '100%' }}
+                        style={{ flex: '1 1 300px', minWidth: '200px' }}
                         allowClear
                     />
                     <Space>
@@ -110,18 +133,14 @@ const LocatorPage = () => {
                             type={viewMode === 'grid' ? 'primary' : 'default'}
                             icon={<AppstoreOutlined />}
                             onClick={() => setViewMode('grid')}
-                        >
-                            Grid
-                        </Button>
+                        />
                         <Button
                             type={viewMode === 'list' ? 'primary' : 'default'}
                             icon={<UnorderedListOutlined />}
                             onClick={() => setViewMode('list')}
-                        >
-                            List
-                        </Button>
+                        />
                     </Space>
-                </Space>
+                </div>
 
                 {/* Results Count */}
                 {!loading && (
@@ -154,13 +173,27 @@ const LocatorPage = () => {
 
                 {/* Grid View */}
                 {!loading && filteredDrugs.length > 0 && viewMode === 'grid' && (
-                    <Row gutter={[16, 16]}>
-                        {filteredDrugs.map((drug) => (
-                            <Col xs={24} sm={12} md={8} lg={6} key={drug.id}>
-                                <DrugCard drug={drug} onClick={() => handleDrugClick(drug)} />
-                            </Col>
-                        ))}
-                    </Row>
+                    <>
+                        <Row gutter={[16, 16]}>
+                            {paginatedDrugs.map((drug) => (
+                                <Col xs={24} sm={12} md={8} lg={6} key={drug.id}>
+                                    <DrugCard drug={drug} onClick={() => handleDrugClick(drug)} />
+                                </Col>
+                            ))}
+                        </Row>
+                        <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
+                            <Pagination
+                                current={currentPage}
+                                total={filteredDrugs.length}
+                                pageSize={pageSize}
+                                onChange={handlePageChange}
+                                onShowSizeChange={handlePageChange}
+                                showSizeChanger
+                                showTotal={(total) => `Total ${total} items`}
+                                pageSizeOptions={['12', '24', '48', '96']}
+                            />
+                        </div>
+                    </>
                 )}
 
                 {/* List View */}
@@ -176,6 +209,16 @@ const LocatorPage = () => {
                             xxl: 3,
                         }}
                         dataSource={filteredDrugs}
+                        pagination={{
+                            current: currentPage,
+                            pageSize: pageSize,
+                            total: filteredDrugs.length,
+                            onChange: handlePageChange,
+                            onShowSizeChange: handlePageChange,
+                            showSizeChanger: true,
+                            showTotal: (total) => `Total ${total} items`,
+                            pageSizeOptions: ['12', '24', '48', '96'],
+                        }}
                         renderItem={(drug) => (
                             <List.Item style={{ marginBottom: 0 }}>
                                 <div

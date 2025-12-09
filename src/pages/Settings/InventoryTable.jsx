@@ -11,7 +11,7 @@ import {
     message,
     Popconfirm,
 } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
 
 const { TextArea } = Input;
@@ -21,6 +21,7 @@ const InventoryTable = () => {
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
     const [editingDrug, setEditingDrug] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -223,9 +224,29 @@ const InventoryTable = () => {
         },
     ];
 
+    // Filter drugs based on search query
+    const filteredDrugs = drugs.filter((drug) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+            drug.name?.toLowerCase().includes(query) ||
+            drug.type?.toLowerCase().includes(query) ||
+            drug.location_code?.toLowerCase().includes(query) ||
+            drug.remarks?.toLowerCase().includes(query)
+        );
+    });
+
     return (
         <div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 16, display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <Input
+                    placeholder="Search by name, type, location, or remarks..."
+                    prefix={<SearchOutlined />}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ flex: '1 1 300px', maxWidth: '500px' }}
+                    allowClear
+                />
                 <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -237,7 +258,7 @@ const InventoryTable = () => {
 
             <Table
                 columns={columns}
-                dataSource={drugs}
+                dataSource={filteredDrugs}
                 rowKey="id"
                 loading={loading}
                 scroll={{ x: 1200 }}
