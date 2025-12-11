@@ -12,11 +12,17 @@ import {
     Button,
     message,
     Descriptions,
+    Checkbox,
+    DatePicker,
+    Row,
+    Col,
 } from 'antd';
 import { EnvironmentOutlined, EditOutlined, FormOutlined } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
 import { getTypeColor } from '../../lib/colorMappings';
 import { getSourceColor } from '../../lib/colorMappings';
+import dayjs from 'dayjs';
+import CustomDateInput from '../../components/CustomDateInput';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -28,6 +34,8 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
     const [minQty, setMinQty] = useState(null);
     const [maxQty, setMaxQty] = useState(null);
     const [indentSource, setIndentSource] = useState(null);
+    const [isShortExp, setIsShortExp] = useState(false);
+    const [shortExp, setShortExp] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const quantityInputRef = useRef(null);
@@ -38,6 +46,8 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
             setMinQty(drug.min_qty);
             setMaxQty(drug.max_qty);
             setIndentSource(drug.indent_source);
+            setIsShortExp(drug.is_short_exp || false);
+            setShortExp(drug.short_exp ? dayjs(drug.short_exp) : null);
             setHasChanges(false);
         }
     }, [drug]);
@@ -71,6 +81,16 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
         setHasChanges(true);
     };
 
+    const handleShortExpChange = (e) => {
+        setIsShortExp(e.target.checked);
+        setHasChanges(true);
+    };
+
+    const handleShortExpDateChange = (date) => {
+        setShortExp(date);
+        setHasChanges(true);
+    };
+
     const saveQuickUpdates = async () => {
         if (!hasChanges) return;
 
@@ -81,6 +101,8 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                     min_qty: minQty,
                     max_qty: maxQty,
                     indent_source: indentSource,
+                    is_short_exp: isShortExp,
+                    short_exp: shortExp ? shortExp.format('YYYY-MM-DD') : null,
                 })
                 .eq('id', drug.id);
 
@@ -197,7 +219,6 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                     {/* Editable Stock Info */}
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            <EditOutlined style={{ fontSize: 12, color: '#1890ff' }} />
                             <Text strong>Quick Edit Stock</Text>
                             {hasChanges && (
                                 <Text type="warning" style={{ fontSize: 12 }}>
@@ -205,8 +226,8 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                                 </Text>
                             )}
                         </div>
-                        <Space size="large" wrap style={{ justifyContent: 'center' }}>
-                            <div>
+                        <Row gutter={[16, 16]} justify="center">
+                            <Col xs={12} sm={6}>
                                 <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                                     Min Qty
                                 </Text>
@@ -215,10 +236,10 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                                     onChange={handleMinQtyChange}
                                     min={0}
                                     placeholder="Min"
-                                    style={{ width: 90 }}
+                                    style={{ width: '100%' }}
                                 />
-                            </div>
-                            <div>
+                            </Col>
+                            <Col xs={12} sm={6}>
                                 <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                                     Max Qty
                                 </Text>
@@ -227,17 +248,20 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                                     onChange={handleMaxQtyChange}
                                     min={0}
                                     placeholder="Max"
-                                    style={{ width: 90 }}
+                                    style={{ width: '100%' }}
                                 />
-                            </div>
-                            <div>
+                            </Col>
+                        </Row>
+                        <Row gutter={[16, 16]} justify="center">
+
+                            <Col xs={24} sm={12}>
                                 <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                                     Indent From
                                 </Text>
                                 <Select
                                     value={indentSource}
                                     onChange={handleIndentSourceChange}
-                                    style={{ width: 130 }}
+                                    style={{ width: '100%' }}
                                     placeholder="Select"
                                     size="middle"
                                 >
@@ -249,8 +273,36 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                                     <Select.Option value="Prepacking">Prepacking</Select.Option>
                                     <Select.Option value="IPD Substore">IPD Substore</Select.Option>
                                 </Select>
-                            </div>
-                        </Space>
+                            </Col>
+                        </Row>
+                        <Row gutter={[16, 16]} justify="center">
+                            <Col xs={24} sm={12}>
+                                <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                                    Short Exp?
+                                </Text>
+                                <Space
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Checkbox
+                                        checked={isShortExp}
+                                        onChange={handleShortExpChange}
+                                    />
+                                    {isShortExp && (
+                                        <CustomDateInput
+                                            value={shortExp}
+                                            onChange={handleShortExpDateChange}
+                                            placeholder="DDMMYY"
+                                        />
+                                    )}
+                                </Space>
+
+                            </Col>
+                        </Row>
                     </div>
 
                     {/* Form */}
@@ -264,16 +316,16 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                     >
                         <Form.Item
                             name="quantity"
-                            label="Quantity"
+                            label="Indent Quantity"
                             rules={[
-                                { required: true, message: 'Please enter quantity' },
+                                { required: true, message: 'Please enter indent quantity' },
                             ]}
                         >
                             <Input
                                 ref={quantityInputRef}
                                 autoFocus
                                 style={{ width: '100%' }}
-                                placeholder="e.g., 10, 5x30's, 2 boxes"
+                                placeholder="e.g., 10 bot, 5x30's, 2 carton"
                             />
                         </Form.Item>
 

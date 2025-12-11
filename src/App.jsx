@@ -4,6 +4,7 @@ import { ConfigProvider, theme } from 'antd';
 import MainLayout from './components/Layout/MainLayout';
 import LocatorPage from './pages/Locator/LocatorPage';
 import IndentPage from './pages/Indent/IndentPage';
+import ShortExpPage from './pages/Shortexp/ShortExpPage';
 import CartPage from './pages/Cart/CartPage';
 import SettingsPage from './pages/Settings/SettingsPage';
 import FloorPlanApp from './pages/Floorplan/FloorPlanApp';
@@ -26,6 +27,7 @@ function App() {
                         <Route path="locator" element={<LocatorPage />} />
                         <Route path="floorplan" element={<FloorPlanApp />} />
                         <Route path="indent" element={<IndentPage />} />
+                        <Route path="shortexp" element={<ShortExpPage />} />
                         <Route path="cart" element={<CartPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                     </Route>

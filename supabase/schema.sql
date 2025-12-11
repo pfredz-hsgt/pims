@@ -60,3 +60,11 @@ CREATE TRIGGER update_indent_requests_updated_at
   BEFORE UPDATE ON indent_requests
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- Add Short Expiry Columns (Added by Migration)
+ALTER TABLE inventory_items 
+ADD COLUMN IF NOT EXISTS is_short_exp BOOLEAN DEFAULT false;
+
+ALTER TABLE inventory_items 
+ADD COLUMN IF NOT EXISTS short_exp DATE;
+
