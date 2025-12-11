@@ -27,7 +27,7 @@ import CustomDateInput from '../../components/CustomDateInput';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
+const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
     const [form] = Form.useForm();
     const [editForm] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -39,6 +39,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
     const [hasChanges, setHasChanges] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const quantityInputRef = useRef(null);
+    const debounceRef = useRef(null);
 
     // Initialize state when drug changes
     useEffect(() => {
@@ -66,14 +67,26 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
 
     if (!drug) return null;
 
-    const handleMinQtyChange = (value) => {
+
+
+    const handleMinQtyChange = (e) => {
+        const value = e && e.target ? e.target.value : e;
         setMinQty(value);
-        setHasChanges(true);
+
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            setHasChanges(true);
+        }, 500);
     };
 
-    const handleMaxQtyChange = (value) => {
+    const handleMaxQtyChange = (e) => {
+        const value = e && e.target ? e.target.value : e;
         setMaxQty(value);
-        setHasChanges(true);
+
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            setHasChanges(true);
+        }, 500);
     };
 
     const handleIndentSourceChange = (value) => {
@@ -92,8 +105,6 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
     };
 
     const saveQuickUpdates = async () => {
-        if (!hasChanges) return;
-
         try {
             const { error } = await supabase
                 .from('inventory_items')
@@ -110,24 +121,25 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
 
             message.success('Item details updated');
             setHasChanges(false);
+            if (onDrugUpdate) onDrugUpdate();
         } catch (error) {
             console.error('Error updating item details:', error);
             message.error('Failed to update item details');
+            throw error;
         }
     };
 
-    const handleClose = async () => {
-        const shouldRefresh = hasChanges;
-        await saveQuickUpdates();
-        onClose(shouldRefresh);
+    const handleClose = () => {
+        // Just close without saving changes
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        onClose(false);
     };
 
     const handleSubmit = async (values) => {
         try {
             setLoading(true);
 
-            // Save quick updates first
-            await saveQuickUpdates();
+
 
             const { error } = await supabase
                 .from('indent_requests')
@@ -142,7 +154,9 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
             onSuccess();
         } catch (error) {
             console.error('Error adding to cart:', error);
-            message.error('Failed to add item to cart');
+            if (!error.message?.includes('item details')) {
+                message.error('Failed to add item to cart');
+            }
         } finally {
             setLoading(false);
         }
@@ -165,6 +179,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
             message.success('Drug updated successfully');
             setEditModalVisible(false);
             editForm.resetFields();
+            if (onDrugUpdate) onDrugUpdate();
         } catch (error) {
             console.error('Error updating drug:', error);
             message.error('Failed to update drug');
@@ -231,10 +246,9 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                                 <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                                     Min Qty
                                 </Text>
-                                <InputNumber
+                                <Input
                                     value={minQty}
                                     onChange={handleMinQtyChange}
-                                    min={0}
                                     placeholder="Min"
                                     style={{ width: '100%' }}
                                 />
@@ -243,10 +257,9 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
                                 <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                                     Max Qty
                                 </Text>
-                                <InputNumber
+                                <Input
                                     value={maxQty}
                                     onChange={handleMaxQtyChange}
-                                    min={0}
                                     placeholder="Max"
                                     style={{ width: '100%' }}
                                 />
@@ -331,6 +344,16 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
 
                         <Form.Item style={{ marginBottom: 0 }}>
                             <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                                {hasChanges && (
+                                    <Button
+                                        onClick={saveQuickUpdates}
+                                        loading={loading}
+                                        type="default"
+                                        style={{ borderColor: '#52c41a', color: '#52c41a' }}
+                                    >
+                                        Save Changes
+                                    </Button>
+                                )}
                                 <Button onClick={handleClose}>Cancel</Button>
                                 <Button type="primary" htmlType="submit" loading={loading}>
                                     Add to Cart
@@ -408,11 +431,11 @@ const IndentModal = ({ drug, visible, onClose, onSuccess }) => {
 
                     <Space style={{ width: '100%' }} size="large">
                         <Form.Item name="min_qty" label="Min Quantity">
-                            <InputNumber min={0} placeholder="0" style={{ width: 120 }} />
+                            <Input placeholder="e.g., 10 bot" style={{ width: 120 }} />
                         </Form.Item>
 
                         <Form.Item name="max_qty" label="Max Quantity">
-                            <InputNumber min={0} placeholder="0" style={{ width: 120 }} />
+                            <Input placeholder="e.g., 50 bot" style={{ width: 120 }} />
                         </Form.Item>
                     </Space>
 

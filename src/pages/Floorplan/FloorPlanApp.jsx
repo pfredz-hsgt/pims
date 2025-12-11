@@ -280,6 +280,9 @@ const CabinetModal = ({ cabinetId, visible, onClose }) => {
           }
         }}
         onSuccess={handleIndentSuccess}
+        onDrugUpdate={() => {
+          if (selectedRow) fetchItems(selectedRow);
+        }}
       />
     </>
   );

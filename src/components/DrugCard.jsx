@@ -31,7 +31,7 @@ const DrugCard = ({ drug, onClick }) => {
                             fontWeight: 'bold',
                         }}
                     >
-                        {drug.location_code ? drug.location_code.split('-').slice(0, 2).join('-') : drug.name.charAt(0)}
+                        {drug.location_code}
                     </div>
                 )
             }
@@ -43,9 +43,6 @@ const DrugCard = ({ drug, onClick }) => {
                     <div style={{ marginTop: 8 }}>
                         <div style={{ marginBottom: 8 }}>
                             <Tag color={getTypeColor(drug.type)}>{drug.type}</Tag>
-                            {drug.indent_source && (
-                                <Tag color={getSourceColor(drug.indent_source)}>{drug.indent_source}</Tag>
-                            )}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <EnvironmentOutlined style={{ color: '#1890ff' }} />

@@ -68,3 +68,9 @@ ADD COLUMN IF NOT EXISTS is_short_exp BOOLEAN DEFAULT false;
 ALTER TABLE inventory_items 
 ADD COLUMN IF NOT EXISTS short_exp DATE;
 
+
+-- Migration to Text for min/max qty (2)
+ALTER TABLE inventory_items 
+ALTER COLUMN min_qty TYPE TEXT USING min_qty::text,
+ALTER COLUMN min_qty DROP DEFAULT,
+ALTER COLUMN max_qty TYPE TEXT USING max_qty::text;

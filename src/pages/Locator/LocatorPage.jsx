@@ -41,10 +41,10 @@ const LocatorPage = () => {
         fetchDrugs();
     }, []);
 
-    const handleSearch = (value) => {
+    const handleSearch = useCallback((value) => {
         setSearchQuery(value);
         setCurrentPage(1); // Reset to first page on new search
-    };
+    }, []);
 
     const fetchDrugs = async () => {
         try {
@@ -279,11 +279,6 @@ const LocatorPage = () => {
                                                 <Tag color={getTypeColor(drug.type)} style={{ margin: 0, fontSize: '11px' }}>
                                                     {drug.type}
                                                 </Tag>
-                                                {drug.indent_source && (
-                                                    <Tag color={getSourceColor(drug.indent_source)} style={{ margin: 0, fontSize: '11px' }}>
-                                                        {drug.indent_source}
-                                                    </Tag>
-                                                )}
                                             </Space>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                                                 <EnvironmentOutlined style={{ color: '#1890ff', fontSize: '12px' }} />

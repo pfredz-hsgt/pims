@@ -21,7 +21,7 @@ import {
 } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
 import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
-import DrugCard from '../../components/DrugCard';
+import DrugCard from '../../components/DrugCard2';
 import IndentModal from './IndentModal';
 import DebouncedSearchInput from '../../components/DebouncedSearchInput';
 
@@ -390,6 +390,7 @@ const IndentPage = () => {
                     }
                 }}
                 onSuccess={handleIndentSuccess}
+                onDrugUpdate={fetchDrugs}
             />
         </div>
     );

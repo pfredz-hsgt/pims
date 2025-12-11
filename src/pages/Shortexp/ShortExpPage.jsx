@@ -255,6 +255,7 @@ const ShortExpPage = () => {
                     message.success('Request processed');
                     setModalVisible(false);
                 }}
+                onDrugUpdate={fetchShortExpDrugs}
             />
         </div>
     );
