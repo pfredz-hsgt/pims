@@ -338,11 +338,11 @@ const InventoryTable = () => {
 
                     <Space style={{ width: '100%' }} size="large">
                         <Form.Item name="min_qty" label="Min Quantity">
-                            <InputNumber min={0} placeholder="0" style={{ width: 120 }} />
+                            <Input placeholder="Min Qty" style={{ width: 120 }} />
                         </Form.Item>
 
                         <Form.Item name="max_qty" label="Max Quantity">
-                            <InputNumber min={0} placeholder="0" style={{ width: 120 }} />
+                            <Input placeholder="Max Qty" style={{ width: 120 }} />
                         </Form.Item>
                     </Space>
 
