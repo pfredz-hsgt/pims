@@ -1,8 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, theme } from 'antd';
 import MainLayout from './components/Layout/MainLayout';
-import LocatorPage from './pages/Locator/LocatorPage';
+import LocatorPage from './pages/Catalog/LocatorPage';
 import IndentPage from './pages/Indent/IndentPage';
 import ShortExpPage from './pages/Shortexp/ShortExpPage';
 import CartPage from './pages/Cart/CartPage';
@@ -20,19 +20,19 @@ function App() {
                 algorithm: theme.defaultAlgorithm,
             }}
         >
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<MainLayout />}>
-                        <Route index element={<Navigate to="/locator" replace />} />
-                        <Route path="locator" element={<LocatorPage />} />
-                        <Route path="floorplan" element={<FloorPlanApp />} />
-                        <Route path="indent" element={<IndentPage />} />
-                        <Route path="shortexp" element={<ShortExpPage />} />
-                        <Route path="cart" element={<CartPage />} />
-                        <Route path="settings" element={<SettingsPage />} />
-                    </Route>
-                </Routes>
-            </BrowserRouter>
+
+            <Routes>
+                <Route path="/" element={<MainLayout />}>
+                    <Route index element={<Navigate to="/catalog" replace />} />
+                    <Route path="catalog" element={<LocatorPage />} />
+                    <Route path="floorplan" element={<FloorPlanApp />} />
+                    <Route path="indent" element={<IndentPage />} />
+                    <Route path="shortexp" element={<ShortExpPage />} />
+                    <Route path="cart" element={<CartPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                </Route>
+            </Routes>
+
         </ConfigProvider>
     );
 }

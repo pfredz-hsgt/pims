@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Row, Col, Typography, Spin, Empty, Button, message } from 'antd';
 import { supabase } from '../../lib/supabase';
 import DrugCard from '../../components/DrugCard2';
-import DrugDetailModal from '../Locator/DrugDetailModal'; // Reuse existing detail modal if needed
+import DrugDetailModal from '../Catalog/DrugDetailModal'; // Reuse existing detail modal if needed
 import IndentModal from '../Indent/IndentModal';
 import './FloorPlan.css';
 

@@ -22,9 +22,9 @@ const MainLayout = () => {
 
     const menuItems = [
         {
-            key: '/locator',
+            key: '/catalog',
             icon: <SearchOutlined />,
-            label: 'Katalog',
+            label: 'Catalog',
         },
         {
             key: '/floorplan',
