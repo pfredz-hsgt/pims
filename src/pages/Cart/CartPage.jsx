@@ -142,134 +142,137 @@ const CartPage = () => {
         }
     };
 
-        const handleExportToPDF = () => {
-            try {
+    const handleExportToPDF = () => {
+        try {
+            let exportCount = 0;
+
+            Object.entries(groupedItems).forEach(([source, items]) => {
+                if (items.length === 0) return;
+
                 const doc = new jsPDF();
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
+                let yPosition = 15;
 
-                Object.entries(groupedItems).forEach(([source, items], sourceIndex) => {
-                    if (items.length === 0) return;
+                // Header - Form Reference
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'italic');
+                doc.text('Pekeliling Perbendaharaan Malaysia', 7, yPosition);
+                doc.setFont(undefined, 'normal');
+                doc.text('AM 6.5 LAMPIRAN B', pageWidth / 2, yPosition, { align: 'center' });
+                doc.text('KEW.PS-8', pageWidth - 7, yPosition, { align: 'right' });
+                yPosition += 10;
 
-                    if (sourceIndex > 0) {
-                        doc.addPage();
-                    }
+                // Title
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                const title = `BORANG PERMOHONAN STOK UBAT (${source})`;
+                doc.text(title, pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 5;
 
-                    let yPosition = 15;
+                // 1. Updated Table Data mapping (added 2 empty columns)
+                const tableData = items.map((item, idx) => [
+                    (idx + 1).toString(),
+                    item.inventory_items?.name || '',
+                    item.requested_qty || 0,
+                    '', // Original Catatan (Empty for manual writing)
+                    '', // Kuantiti Diluluskan (Empty for manual writing)
+                    '', // New Catatan (Empty for manual writing)
+                ]);
 
-                    // Header - Form Reference
-                    doc.setFontSize(8);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('Pekeliling Perbendaharaan Malaysia', 7, yPosition);
-                    doc.setFont(undefined, 'normal');
-                    doc.text('AM 6.5 LAMPIRAN B', pageWidth / 2, yPosition, { align: 'center' });
-                    doc.text('KEW.PS-8', pageWidth - 7, yPosition, { align: 'right' });
-                    yPosition += 10;
+                autoTable(doc, {
+                    startY: yPosition,
+                    head: [[
+                        { content: 'Bil', styles: { halign: 'center' } },
+                        { content: 'Perihal stok', styles: { halign: 'center' } },
+                        { content: 'Kuantiti', styles: { halign: 'center' } },
+                        { content: 'Catatan', styles: { halign: 'center' } },
+                        { content: 'Kuantiti Diluluskan', styles: { halign: 'center' } },
+                        { content: 'Catatan', styles: { halign: 'center' } },
+                    ]],
+                    body: tableData,
+                    theme: 'grid',
+                    styles: {
+                        fontSize: 10, // Slightly smaller font to accommodate more columns
+                        cellPadding: 3,
+                    },
+                    headStyles: {
+                        fillColor: [255, 255, 255],
+                        textColor: [0, 0, 0],
+                        fontStyle: 'bold',
+                        lineWidth: 0.2,
+                        lineColor: [0, 0, 0],
+                    },
+                    bodyStyles: {
+                        lineWidth: 0.2,
+                        lineColor: [0, 0, 0],
+                        minCellHeight: 9, // Added height for manual writing room
+                    },
+                    // 2. Adjusted widths: First 4 cols ~65%, Last 2 cols ~35%
+                    columnStyles: {
+                        0: { cellWidth: 11, halign: 'center' }, // Bil
+                        1: { cellWidth: 78 },                  // Perihal
+                        2: { cellWidth: 29, halign: 'center' }, // Kuantiti
+                        3: { cellWidth: 25 },                  // Catatan (Req)
+                        4: { cellWidth: 29, halign: 'center' }, // Kuantiti Diluluskan
+                        5: { cellWidth: 25 },                  // Catatan (Appr)
+                    },
+                    margin: { bottom: 50, left: 7, right: 7 },
 
-                    // Title
-                    doc.setFontSize(12);
-                    doc.setFont(undefined, 'bold');
-                    const title = `BORANG PERMOHONAN STOK UBAT (${source})`;
-                    doc.text(title, pageWidth / 2, yPosition, { align: 'center' });
-                    yPosition += 5;
-
-                    // 1. Updated Table Data mapping (added 2 empty columns)
-                    const tableData = items.map((item, idx) => [
-                        (idx + 1).toString(),
-                        item.inventory_items?.name || '',
-                        item.requested_qty || 0,
-                        '', // Original Catatan (Empty for manual writing)
-                        '', // Kuantiti Diluluskan (Empty for manual writing)
-                        '', // New Catatan (Empty for manual writing)
-                    ]);
-
-                    autoTable(doc, {
-                        startY: yPosition,
-                        head: [[
-                            { content: 'Bil', styles: { halign: 'center' } },
-                            { content: 'Perihal stok', styles: { halign: 'center' } },
-                            { content: 'Kuantiti', styles: { halign: 'center' } },
-                            { content: 'Catatan', styles: { halign: 'center' } },
-                            { content: 'Kuantiti Diluluskan', styles: { halign: 'center' } },
-                            { content: 'Catatan', styles: { halign: 'center' } },
-                        ]],
-                        body: tableData,
-                        theme: 'grid',
-                        styles: {
-                            fontSize: 10, // Slightly smaller font to accommodate more columns
-                            cellPadding: 3,
-                        },
-                        headStyles: {
-                            fillColor: [255, 255, 255],
-                            textColor: [0, 0, 0],
-                            fontStyle: 'bold',
-                            lineWidth: 0.2,
-                            lineColor: [0, 0, 0],
-                        },
-                        bodyStyles: {
-                            lineWidth: 0.2,
-                            lineColor: [0, 0, 0],
-                            minCellHeight: 9, // Added height for manual writing room
-                        },
-                        // 2. Adjusted widths: First 4 cols ~65%, Last 2 cols ~35%
-                        columnStyles: {
-                            0: { cellWidth: 11, halign: 'center' }, // Bil
-                            1: { cellWidth: 78 },                  // Perihal
-                            2: { cellWidth: 29, halign: 'center' }, // Kuantiti
-                            3: { cellWidth: 25 },                  // Catatan (Req)
-                            4: { cellWidth: 29, halign: 'center' }, // Kuantiti Diluluskan
-                            5: { cellWidth: 25 },                  // Catatan (Appr)
-                        },
-                        margin: { bottom: 50, left: 7, right: 7 },
-                        
-                        // 3. Hook to draw the Thick Border
-                        didDrawCell: function (data) {
-                            // Check if this is the 'Kuantiti Diluluskan' column (Index 4)
-                            if (data.column.index === 4) {
-                                doc.setLineWidth(0.8); // Set thick line
-                                doc.line(data.cell.x, data.cell.y, data.cell.x, data.cell.y + data.cell.height);
-                                doc.setLineWidth(0.2); // Reset to default
-                            }
-                        },
-
-                        didDrawPage: function (data) {
-                            const finalY = pageHeight - 50;
-                            doc.setFontSize(9);
-                            doc.setFont(undefined, 'normal');
-
-                            // Footer signatures...
-                            const leftX = 15;
-                            doc.text('Pemohon', leftX, finalY);
-                            doc.text('(Tandatangan)', leftX, finalY + 15);
-                            doc.text('Nama : Muhd Redzuan', leftX, finalY + 20);
-                            doc.text('Jawatan : Pegawai Farmasi UF48', leftX, finalY + 25);
-                            doc.text('Tarikh :', leftX, finalY + 30);
-
-                            const middleX = pageWidth / 2 - 20;
-                            doc.text('Pegawai Pelulus', middleX, finalY);
-                            doc.text('(Tandatangan)', middleX, finalY + 15);
-                            doc.text('Nama :', middleX, finalY + 20);
-                            doc.text('Jawatan :', middleX, finalY + 25);
-                            doc.text('Tarikh :', middleX, finalY + 30);
-
-                            const rightX = pageWidth - 60;
-                            doc.text('Penerima', rightX, finalY);
-                            doc.text('(Tandatangan)', rightX, finalY + 15);
-                            doc.text('Nama :  ', rightX, finalY + 20);
-                            doc.text('Jawatan :  ', rightX, finalY + 25);
-                            doc.text('Tarikh :', rightX, finalY + 30);
+                    // 3. Hook to draw the Thick Border
+                    didDrawCell: function (data) {
+                        // Check if this is the 'Kuantiti Diluluskan' column (Index 4)
+                        if (data.column.index === 4) {
+                            doc.setLineWidth(0.8); // Set thick line
+                            doc.line(data.cell.x, data.cell.y, data.cell.x, data.cell.y + data.cell.height);
+                            doc.setLineWidth(0.2); // Reset to default
                         }
-                    });
+                    },
+
                 });
 
+                // Signatures (Moved outside autoTable to show only on last page)
+                const finalY = pageHeight - 50;
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                const leftX = 15;
+                doc.text('Pemohon', leftX, finalY);
+                doc.text('(Tandatangan)', leftX, finalY + 15);
+                doc.text('Nama : Muhd Redzuan', leftX, finalY + 20);
+                doc.text('Jawatan : Pegawai Farmasi UF48', leftX, finalY + 25);
+                doc.text('Tarikh :', leftX, finalY + 30);
+
+                const middleX = pageWidth / 2 - 20;
+                doc.text('Pegawai Pelulus', middleX, finalY);
+                doc.text('(Tandatangan)', middleX, finalY + 15);
+                doc.text('Nama :', middleX, finalY + 20);
+                doc.text('Jawatan :', middleX, finalY + 25);
+                doc.text('Tarikh :', middleX, finalY + 30);
+
+                const rightX = pageWidth - 60;
+                doc.text('Penerima', rightX, finalY);
+                doc.text('(Tandatangan)', rightX, finalY + 15);
+                doc.text('Nama :  ', rightX, finalY + 20);
+                doc.text('Jawatan :  ', rightX, finalY + 25);
+                doc.text('Tarikh :', rightX, finalY + 30);
+
+                // Save individual file per source
                 const timestamp = new Date().toISOString().split('T')[0];
-                doc.save(`Indent_Request_${timestamp}.pdf`);
-                message.success('PDF exported successfully!');
-            } catch (error) {
-                console.error('Error exporting to PDF:', error);
-                message.error('Failed to export to PDF');
+                doc.save(`Indent_ED_${source}_${timestamp}.pdf`);
+                exportCount++;
+            });
+
+            if (exportCount > 0) {
+                message.success(`Successfully exported ${exportCount} PDF file(s)!`);
+            } else {
+                message.warning('No items to export.');
             }
-        };
+        } catch (error) {
+            console.error('Error exporting to PDF:', error);
+            message.error('Failed to export to PDF');
+        }
+    };
 
     const handleExportToExcel = () => {
         try {
@@ -382,7 +385,7 @@ const CartPage = () => {
                     <div>
                         <Title level={3} style={{ margin: 0 }}>Indent Cart</Title>
                         <Text type="secondary">
-                            {totalItems} {totalItems === 1 ? 'item' : 'items'} pending
+                            {totalItems} {totalItems === 1 ? 'item' : 'items'} in cart
                         </Text>
                     </div>
                     <Space wrap>
