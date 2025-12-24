@@ -236,6 +236,24 @@ const InventoryTable = () => {
         );
     });
 
+    // Handle Enter key for modal submission
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!modalVisible) return;
+
+            // Allow Enter in TextArea to function normally (new line)
+            if (e.target.tagName.toLowerCase() === 'textarea') return;
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                form.submit();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [modalVisible, form]);
+
     return (
         <div>
             <div style={{ marginBottom: 16, display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -267,7 +285,7 @@ const InventoryTable = () => {
                     style: { cursor: 'pointer' },
                 })}
                 pagination={{
-                    pageSize: 10,
+                    defaultPageSize: 10,
                     showSizeChanger: true,
                     showTotal: (total) => `Total ${total} items`,
                 }}

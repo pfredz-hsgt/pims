@@ -80,12 +80,12 @@ const MainLayout = () => {
                         color: 'white',
                         margin: 0,
                         letterSpacing: '6px',
-                        fontWeight: 300,
+                        fontWeight: 400,
                         background: 'linear-gradient(to right, #4facfe 0%, #00f2fe 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         textTransform: 'uppercase',
-                        fontSize: '24px',
+                        fontSize: '26px',
                         fontFamily: "'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
                     }}>
                         EPIX
@@ -99,7 +99,7 @@ const MainLayout = () => {
                         marginTop: '4px',
                         fontWeight: 400
                     }}>
-                        ED Pharmacy<br />Inventory eXchange
+                        ED Pharmacy<br />Inventory aXcess
                     </Typography.Text>
                 </div>
                 <Menu

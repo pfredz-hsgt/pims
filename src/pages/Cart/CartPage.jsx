@@ -457,19 +457,10 @@ const CartPage = () => {
                                                     title={
                                                         <Space>
                                                             <Text strong>{item.inventory_items?.name}</Text>
-                                                            <Tag color={getTypeColor(item.inventory_items?.type)}>
-                                                                {item.inventory_items?.type}
-                                                            </Tag>
                                                         </Space>
                                                     }
                                                     description={
                                                         <Space direction="vertical" size="small">
-                                                            <Space>
-                                                                <EnvironmentOutlined style={{ color: '#1890ff' }} />
-                                                                <Text type="secondary">
-                                                                    {item.inventory_items?.location_code}
-                                                                </Text>
-                                                            </Space>
                                                             <Text>Quantity: <Text strong>{item.requested_qty}</Text></Text>
                                                         </Space>
                                                     }

@@ -65,7 +65,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
         }
     }, [visible]);
 
-    if (!drug) return null;
+
 
 
 
@@ -186,6 +186,29 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
             message.error('Failed to update drug');
         }
     };
+
+    // Handle Enter key shortcut
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.defaultPrevented) return;
+
+            if (visible && !editModalVisible && e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (hasChanges) {
+                    saveQuickUpdates();
+                } else {
+                    form.submit();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [visible, editModalVisible, hasChanges, form, saveQuickUpdates]);
+
+    if (!drug) return null;
 
     return (
         <>

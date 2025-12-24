@@ -182,12 +182,14 @@ const ShortExpPage = () => {
                             if (daysLeft < 30) daysColor = 'red';
                             else if (daysLeft < 90) daysColor = 'orange';
 
+                            const isCritical = daysLeft < 30;
+
                             return (
                                 <List.Item>
                                     <div
                                         onClick={() => handleRowClick(drug)}
                                         style={{
-                                            border: '1px solid #f0f0f0',
+                                            border: `1px solid ${isCritical ? '#ff4d4f' : '#f0f0f0'}`,
                                             borderRadius: '8px',
                                             padding: '16px',
                                             cursor: 'pointer',
@@ -196,15 +198,25 @@ const ShortExpPage = () => {
                                             position: 'relative',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            gap: '12px'
+                                            gap: '12px',
+                                            boxShadow: isCritical ? '0 0 10px rgba(255, 77, 79, 0.5)' : 'none',
                                         }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.borderColor = '#1890ff';
-                                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                                            if (isCritical) {
+                                                e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 77, 79, 0.7)';
+                                            } else {
+                                                e.currentTarget.style.borderColor = '#1890ff';
+                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                                            }
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.borderColor = '#f0f0f0';
-                                            e.currentTarget.style.boxShadow = 'none';
+                                            if (isCritical) {
+                                                e.currentTarget.style.borderColor = '#ff4d4f';
+                                                e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 77, 79, 0.5)';
+                                            } else {
+                                                e.currentTarget.style.borderColor = '#f0f0f0';
+                                                e.currentTarget.style.boxShadow = 'none';
+                                            }
                                         }}
                                     >
                                         {/* Header: Name and Days Left Badge */}
