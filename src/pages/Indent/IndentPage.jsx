@@ -12,12 +12,15 @@ import {
     Input,
     List,
     Tag,
+    Select,
+    Table,
 } from 'antd';
 import {
     SearchOutlined,
     AppstoreOutlined,
     UnorderedListOutlined,
     EnvironmentOutlined,
+    TableOutlined,
 } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
 import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
@@ -34,10 +37,12 @@ const IndentPage = () => {
     const [selectedDrug, setSelectedDrug] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [sections, setSections] = useState([]);
+    const [indentSources, setIndentSources] = useState([]);
+    const [selectedIndentSource, setSelectedIndentSource] = useState('ALL');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(24);
     const [searchQuery, setSearchQuery] = useState('');
-    const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
+    const [viewMode, setViewMode] = useState('table'); // 'grid' or 'list' or 'table'
 
     useEffect(() => {
         fetchDrugs();
@@ -47,7 +52,7 @@ const IndentPage = () => {
     // Reset to first page when section changes or search query changes
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedSection, searchQuery]);
+    }, [selectedSection, searchQuery, selectedIndentSource]);
 
     const fetchDrugs = async () => {
         try {
@@ -93,6 +98,10 @@ const IndentPage = () => {
             // Extract unique sections
             const uniqueSections = [...new Set(data.map(d => d.section))].sort();
             setSections(uniqueSections);
+
+            // Extract unique indent sources
+            const uniqueSources = [...new Set(data.map(d => d.indent_source).filter(Boolean))].sort();
+            setIndentSources(uniqueSources);
         } catch (error) {
             console.error('Error fetching drugs:', error);
             message.error('Failed to load inventory items');
@@ -132,6 +141,11 @@ const IndentPage = () => {
             result = result.filter(drug => drug.section === selectedSection);
         }
 
+        // Filter by indent source
+        if (selectedIndentSource !== 'ALL') {
+            result = result.filter(drug => drug.indent_source === selectedIndentSource);
+        }
+
         // Filter by search query
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
@@ -143,7 +157,7 @@ const IndentPage = () => {
         }
 
         return result;
-    }, [selectedSection, searchQuery, drugs]);
+    }, [selectedSection, searchQuery, selectedIndentSource, drugs]);
 
     // Memoize paginated drugs
     const paginatedDrugs = useMemo(() => {
@@ -170,6 +184,91 @@ const IndentPage = () => {
         setModalVisible(false);
         message.success('Item added to cart successfully!');
     }, []);
+
+    const columns = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            width: 500,
+            render: (text, record) => (
+                <Space direction="vertical" size={0}>
+                    <Text strong>{text}</Text>
+                    <Text type="secondary" style={{ fontSize: '11px' }}>{record.generic_name}</Text>
+                </Space>
+            ),
+        },
+        {
+            title: 'Type',
+            dataIndex: 'type',
+            key: 'type',
+            width: 120,
+            filters: [
+                { text: 'OPD', value: 'OPD' },
+                { text: 'Eye/Ear/Nose/Inh', value: 'Eye/Ear/Nose/Inh' },
+                { text: 'DDA', value: 'DDA' },
+                { text: 'External', value: 'External' },
+                { text: 'Injection', value: 'Injection' },
+                { text: 'Syrup', value: 'Syrup' },
+                { text: 'Others', value: 'Others' },
+                { text: 'UOD', value: 'UOD' },
+            ],
+            onFilter: (value, record) => record.type === value,
+            render: (type) => (
+                <Tag color={getTypeColor(type)}>
+                    {type}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Location',
+            dataIndex: 'location_code',
+            key: 'location_code',
+            sorter: (a, b) => a.location_code.localeCompare(b.location_code),
+            width: 120,
+            render: (text) => (
+                <Space size={4}>
+                    <EnvironmentOutlined style={{ color: '#1890ff' }} />
+                    {text}
+                </Space>
+            ),
+        },
+        {
+            title: 'Min',
+            dataIndex: 'min_qty',
+            key: 'min_qty',
+            width: 120,
+            responsive: ['md'],
+        },
+        {
+            title: 'Max',
+            dataIndex: 'max_qty',
+            key: 'max_qty',
+            width: 120,
+            responsive: ['md'],
+        },
+        {
+            title: 'Source',
+            dataIndex: 'indent_source',
+            key: 'indent_source',
+            width: 120,
+            render: (source) => source && (
+                <Tag color={getSourceColor(source)}>
+                    {source}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Remarks',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            ellipsis: true,
+            render: (text) => (
+                <Text type="secondary" style={{ fontSize: '12px' }}>{text}</Text>
+            ),
+        },
+    ];
 
     return (
         <div>
@@ -211,6 +310,20 @@ const IndentPage = () => {
                         size="large"
                         style={{ flex: '1 1 300px', minWidth: '200px' }}
                     />
+                    <Select
+                        placeholder="Filter by Source"
+                        style={{ width: 180 }}
+                        size="large"
+                        allowClear
+                        value={selectedIndentSource === 'ALL' ? null : selectedIndentSource}
+                        onChange={(value) => setSelectedIndentSource(value || 'ALL')}
+                    >
+                        {indentSources.map(source => (
+                            <Select.Option key={source} value={source}>
+                                {source}
+                            </Select.Option>
+                        ))}
+                    </Select>
                     <Space>
                         <Button
                             type={viewMode === 'grid' ? 'primary' : 'default'}
@@ -221,6 +334,11 @@ const IndentPage = () => {
                             type={viewMode === 'list' ? 'primary' : 'default'}
                             icon={<UnorderedListOutlined />}
                             onClick={() => setViewMode('list')}
+                        />
+                        <Button
+                            type={viewMode === 'table' ? 'primary' : 'default'}
+                            icon={<TableOutlined />}
+                            onClick={() => setViewMode('table')}
                         />
                     </Space>
                 </div>
@@ -247,6 +365,29 @@ const IndentPage = () => {
                 {/* Empty State */}
                 {!loading && filteredDrugs.length === 0 && (
                     <Empty description="No drugs in this section" />
+                )}
+
+                {/* Table View */}
+                {!loading && filteredDrugs.length > 0 && viewMode === 'table' && (
+                    <Table
+                        columns={columns}
+                        dataSource={filteredDrugs}
+                        rowKey="id"
+                        pagination={{
+                            current: currentPage,
+                            pageSize: pageSize,
+                            total: filteredDrugs.length,
+                            onChange: handlePageChange,
+                            showSizeChanger: true,
+                            showTotal: (total) => `Total ${total} items`,
+                            pageSizeOptions: ['12', '24', '48', '96'],
+                        }}
+                        onRow={(record) => ({
+                            onClick: () => handleDrugClick(record),
+                            style: { cursor: 'pointer' },
+                        })}
+                        scroll={{ x: 1000 }}
+                    />
                 )}
 
                 {/* Grid View */}
