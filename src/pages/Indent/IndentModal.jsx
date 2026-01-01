@@ -40,6 +40,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
     const [editModalVisible, setEditModalVisible] = useState(false);
     const quantityInputRef = useRef(null);
     const debounceRef = useRef(null);
+    const [isIndentSourceDropdownOpen, setIsIndentSourceDropdownOpen] = useState(false);
 
     // Initialize state when drug changes
     useEffect(() => {
@@ -91,6 +92,10 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
 
     const handleIndentSourceChange = (value) => {
         setIndentSource(value);
+        setIsIndentSourceDropdownOpen(false);
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
         setHasChanges(true);
     };
 
@@ -217,6 +222,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                 onCancel={handleClose}
                 destroyOnHidden
                 zIndex={1000}
+                centered
                 title={
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
                         <span>Add to Indent Cart</span>
@@ -301,6 +307,10 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                                     style={{ width: '100%' }}
                                     placeholder="Select"
                                     size="middle"
+                                    virtual={false}
+                                    showSearch={false}
+                                    open={isIndentSourceDropdownOpen}
+                                    onDropdownVisibleChange={(visible) => setIsIndentSourceDropdownOpen(visible)}
                                 >
                                     <Select.Option value="OPD Counter">OPD Counter</Select.Option>
                                     <Select.Option value="OPD Substore">OPD Substore</Select.Option>
@@ -396,6 +406,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                 onOk={() => editForm.submit()}
                 width={600}
                 zIndex={2000}
+                centered
             >
                 <Form
                     form={editForm}
@@ -415,7 +426,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                         label="Type"
                         rules={[{ required: true, message: 'Please select type' }]}
                     >
-                        <Select placeholder="Select drug type">
+                        <Select placeholder="Select drug type" virtual={false}>
                             <Select.Option value="OPD">OPD</Select.Option>
                             <Select.Option value="Eye/Ear/Nose/Inh">Eye/Ear/Nose/Inh</Select.Option>
                             <Select.Option value="DDA">DDA</Select.Option>
@@ -464,7 +475,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                     </Space>
 
                     <Form.Item name="indent_source" label="Indent Source">
-                        <Select placeholder="Select source">
+                        <Select placeholder="Select source" virtual={false}>
                             <Select.Option value="OPD Counter">OPD Counter</Select.Option>
                             <Select.Option value="OPD Substore">OPD Substore</Select.Option>
                             <Select.Option value="IPD Counter">IPD Counter</Select.Option>

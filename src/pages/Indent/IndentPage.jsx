@@ -240,6 +240,7 @@ const IndentPage = () => {
             key: 'min_qty',
             width: 120,
             responsive: ['md'],
+            align: 'center',
         },
         {
             title: 'Max',
@@ -247,6 +248,7 @@ const IndentPage = () => {
             key: 'max_qty',
             width: 120,
             responsive: ['md'],
+            align: 'center',
         },
         {
             title: 'Source',
@@ -480,6 +482,14 @@ const IndentPage = () => {
                                                 <EnvironmentOutlined style={{ color: '#1890ff', fontSize: '12px' }} />
                                                 <Text strong style={{ fontSize: '12px' }}>
                                                     {drug.location_code}
+                                                </Text>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                                <Text type="secondary" style={{ fontSize: '11px' }}>
+                                                    Min: <Text strong style={{ fontSize: '11px' }}>{drug.min_qty || 'N/A'}</Text>
+                                                </Text>
+                                                <Text type="secondary" style={{ fontSize: '11px' }}>
+                                                    Max: <Text strong style={{ fontSize: '11px' }}>{drug.max_qty || 'N/A'}</Text>
                                                 </Text>
                                             </div>
                                             {drug.remarks && (

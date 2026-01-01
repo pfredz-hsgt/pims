@@ -51,6 +51,14 @@ const DrugCard = ({ drug, onClick }) => {
                             <EnvironmentOutlined style={{ color: '#1890ff' }} />
                             <Text type="secondary">{drug.location_code}</Text>
                         </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                Min: <Text strong style={{ fontSize: '12px' }}>{drug.min_qty || 'N/A'}</Text>
+                            </Text>
+                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                Max: <Text strong style={{ fontSize: '12px' }}>{drug.max_qty || 'N/A'}</Text>
+                            </Text>
+                        </div>
                         {drug.remarks && (
                             <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: 4 }}>
                                 {drug.remarks}

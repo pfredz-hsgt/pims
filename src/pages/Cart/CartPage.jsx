@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Typography,
     Space,
@@ -12,6 +12,9 @@ import {
     Modal,
     Input,
     Popconfirm,
+    Select,
+    Row,
+    Col,
 } from 'antd';
 import {
     DeleteOutlined,
@@ -35,6 +38,13 @@ const CartPage = () => {
     const [groupedItems, setGroupedItems] = useState({});
     const [editingItem, setEditingItem] = useState(null);
     const [editQuantity, setEditQuantity] = useState('');
+    const [editMinQty, setEditMinQty] = useState('');
+    const [editMaxQty, setEditMaxQty] = useState('');
+    const [editIndentSource, setEditIndentSource] = useState('');
+    const [editRemarks, setEditRemarks] = useState('');
+    const [hasChanges, setHasChanges] = useState(false);
+    const [isIndentSourceDropdownOpen, setIsIndentSourceDropdownOpen] = useState(false);
+    const debounceRef = useRef(null);
 
     useEffect(() => {
         fetchCartItems();
@@ -105,24 +115,94 @@ const CartPage = () => {
     const handleEdit = (item) => {
         setEditingItem(item);
         setEditQuantity(item.requested_qty);
+        setEditMinQty(item.inventory_items?.min_qty || '');
+        setEditMaxQty(item.inventory_items?.max_qty || '');
+        setEditIndentSource(item.inventory_items?.indent_source || '');
+        setEditRemarks(item.inventory_items?.remarks || '');
+        setHasChanges(false);
+        setIsIndentSourceDropdownOpen(false);
     };
 
-    const handleSaveEdit = async () => {
+    const handleMinQtyChange = (e) => {
+        const value = e && e.target ? e.target.value : e;
+        setEditMinQty(value);
+
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            setHasChanges(true);
+        }, 500);
+    };
+
+    const handleMaxQtyChange = (e) => {
+        const value = e && e.target ? e.target.value : e;
+        setEditMaxQty(value);
+
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            setHasChanges(true);
+        }, 500);
+    };
+
+    const handleIndentSourceChange = (value) => {
+        setEditIndentSource(value);
+        setIsIndentSourceDropdownOpen(false);
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+        setHasChanges(true);
+    };
+
+    const handleRemarksChange = (e) => {
+        setEditRemarks(e.target.value);
+        setHasChanges(true);
+    };
+
+    const handleQuantityChange = (e) => {
+        setEditQuantity(e.target.value);
+        setHasChanges(true);
+    };
+
+    const handleCloseEdit = () => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        setEditingItem(null);
+        setHasChanges(false);
+    };
+
+    const saveQuickUpdates = async () => {
         try {
-            const { error } = await supabase
+            // Update inventory item details
+            const { error: inventoryError } = await supabase
+                .from('inventory_items')
+                .update({
+                    min_qty: editMinQty,
+                    max_qty: editMaxQty,
+                    indent_source: editIndentSource,
+                    remarks: editRemarks,
+                })
+                .eq('id', editingItem.item_id);
+
+            if (inventoryError) throw inventoryError;
+
+            // Update indent request quantity
+            const { error: requestError } = await supabase
                 .from('indent_requests')
                 .update({ requested_qty: editQuantity })
                 .eq('id', editingItem.id);
 
-            if (error) throw error;
+            if (requestError) throw requestError;
 
-            message.success('Quantity updated');
+            message.success('Item details updated');
+            setHasChanges(false);
             setEditingItem(null);
             fetchCartItems();
         } catch (error) {
-            console.error('Error updating quantity:', error);
-            message.error('Failed to update quantity');
+            console.error('Error updating item details:', error);
+            message.error('Failed to update item details');
         }
+    };
+
+    const handleSaveEdit = async () => {
+        await saveQuickUpdates();
     };
 
     const handleApproveIndent = async () => {
@@ -479,22 +559,131 @@ const CartPage = () => {
                 )}
             </Space>
 
-            {/* Edit Quantity Modal */}
+            {/* Edit Cart Item Modal */}
             <Modal
-                title="Edit Quantity"
+                title="Edit Cart Item"
                 open={editingItem !== null}
-                onOk={handleSaveEdit}
+                onCancel={handleCloseEdit}
                 centered
-                onCancel={() => setEditingItem(null)}
+                width={400}
+                footer={null}
             >
-                <Space direction="vertical" style={{ width: '100%' }}>
-                    <Text>Update quantity for: <Text strong>{editingItem?.inventory_items?.name}</Text></Text>
-                    <Input
-                        value={editQuantity}
-                        onChange={(e) => setEditQuantity(e.target.value)}
-                        style={{ width: '100%' }}
-                        placeholder="e.g., 10, 5x30's, 2 boxes"
-                    />
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    {/* Drug Info */}
+                    <div style={{ textAlign: 'center' }}>
+                        <Title level={4} style={{ marginBottom: 8 }}>
+                            {editingItem?.inventory_items?.name}
+                        </Title>
+                        <Space>
+                            <Tag color={getSourceColor(editingItem?.inventory_items?.indent_source)}>
+                                {editingItem?.inventory_items?.indent_source}
+                            </Tag>
+                            <Space size="small">
+                                <EnvironmentOutlined style={{ color: '#1890ff' }} />
+                                <Text type="secondary">{editingItem?.inventory_items?.location_code}</Text>
+                            </Space>
+                        </Space>
+                    </div>
+
+                    {/* Editable Stock Info */}
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                            <Text strong>Quick Edit</Text>
+                            {hasChanges && (
+                                <Text type="warning" style={{ fontSize: 12 }}>
+                                    (unsaved changes)
+                                </Text>
+                            )}
+                        </div>
+                        <Row gutter={[16, 16]} justify="center">
+                            <Col xs={12} sm={6}>
+                                <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                                    Min Qty
+                                </Text>
+                                <Input
+                                    value={editMinQty}
+                                    onChange={handleMinQtyChange}
+                                    placeholder="Min"
+                                    style={{ width: '100%' }}
+                                />
+                            </Col>
+                            <Col xs={12} sm={6}>
+                                <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                                    Max Qty
+                                </Text>
+                                <Input
+                                    value={editMaxQty}
+                                    onChange={handleMaxQtyChange}
+                                    placeholder="Max"
+                                    style={{ width: '100%' }}
+                                />
+                            </Col>
+                        </Row>
+                        <Row gutter={[16, 16]} justify="center">
+                            <Col xs={24} sm={12}>
+                                <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                                    Indent From
+                                </Text>
+                                <Select
+                                    value={editIndentSource}
+                                    onChange={handleIndentSourceChange}
+                                    style={{ width: '100%' }}
+                                    placeholder="Select"
+                                    size="middle"
+                                    virtual={false}
+                                    open={isIndentSourceDropdownOpen}
+                                    onDropdownVisibleChange={(visible) => setIsIndentSourceDropdownOpen(visible)}
+                                >
+                                    <Select.Option value="OPD Counter">OPD Counter</Select.Option>
+                                    <Select.Option value="OPD Substore">OPD Substore</Select.Option>
+                                    <Select.Option value="IPD Counter">IPD Counter</Select.Option>
+                                    <Select.Option value="MNF Substor">MNF Substor</Select.Option>
+                                    <Select.Option value="Manufact">Manufact</Select.Option>
+                                    <Select.Option value="Prepacking">Prepacking</Select.Option>
+                                    <Select.Option value="IPD Substore">IPD Substore</Select.Option>
+                                </Select>
+                            </Col>
+                        </Row>
+                    </div>
+
+                    {/* Remarks */}
+                    <div>
+                        <Text style={{ display: 'block', marginBottom: 8 }}>
+                            Remarks
+                        </Text>
+                        <Text type="secondary">
+                            {editRemarks || 'No remarks'}
+                        </Text>
+                    </div>
+
+                    {/* Indent Quantity */}
+                    <div>
+                        <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                            Indent Quantity
+                        </Text>
+                        <Input
+                            value={editQuantity}
+                            onChange={handleQuantityChange}
+                            style={{ width: '100%' }}
+                            placeholder="e.g., 10 bot, 5x30's, 2 carton"
+                        />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div style={{ marginBottom: 0 }}>
+                        <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                            {hasChanges && (
+                                <Button
+                                    onClick={saveQuickUpdates}
+                                    type="default"
+                                    style={{ borderColor: '#52c41a', color: '#52c41a' }}
+                                >
+                                    Save Changes
+                                </Button>
+                            )}
+                            <Button onClick={handleCloseEdit}>Cancel</Button>
+                        </Space>
+                    </div>
                 </Space>
             </Modal>
 
