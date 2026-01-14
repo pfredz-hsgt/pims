@@ -274,7 +274,7 @@ const IndentPage = () => {
 
     return (
         <div>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 {/* Header */}
                 <div>
                     <Title level={3}>Indent Management</Title>
@@ -344,14 +344,6 @@ const IndentPage = () => {
                         />
                     </Space>
                 </div>
-
-                {/* Results Count */}
-                {!loading && (
-                    <Text type="secondary">
-                        {filteredDrugs.length} {filteredDrugs.length === 1 ? 'item' : 'items'}
-                        {selectedSection !== 'ALL' && ` in Section ${selectedSection}`}
-                    </Text>
-                )}
 
                 {/* Loading State */}
                 {loading && (

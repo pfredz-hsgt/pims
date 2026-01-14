@@ -138,7 +138,7 @@ const LocatorPage = () => {
 
     return (
         <div>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 {/* Header */}
                 <div>
                     <Title level={3}>Katalog Farmasi ED</Title>
