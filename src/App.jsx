@@ -6,6 +6,7 @@ import LocatorPage from './pages/Catalog/LocatorPage';
 import IndentPage from './pages/Indent/IndentPage';
 import ShortExpPage from './pages/Shortexp/ShortExpPage';
 import CartPage from './pages/Cart/CartPage';
+import IndentListPage from './pages/Cart/IndentListPage';
 import SettingsPage from './pages/Settings/SettingsPage';
 import FloorPlanApp from './pages/Floorplan/FloorPlanApp';
 
@@ -29,6 +30,7 @@ function App() {
                     <Route path="indent" element={<IndentPage />} />
                     <Route path="shortexp" element={<ShortExpPage />} />
                     <Route path="cart" element={<CartPage />} />
+                    <Route path="indent-list" element={<IndentListPage />} />
                     <Route path="settings" element={<SettingsPage />} />
                 </Route>
             </Routes>

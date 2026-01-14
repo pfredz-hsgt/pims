@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Typography,
     Space,
@@ -22,6 +23,7 @@ import {
     CheckCircleOutlined,
     EnvironmentOutlined,
     FileExcelOutlined,
+    HistoryOutlined,
 } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
 import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
@@ -33,6 +35,7 @@ const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 const CartPage = () => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [cartItems, setCartItems] = useState([]);
     const [groupedItems, setGroupedItems] = useState({});
@@ -496,6 +499,12 @@ const CartPage = () => {
                         </Text>
                     </div>
                     <Space wrap>
+                        <Button
+                            icon={<HistoryOutlined />}
+                            onClick={() => navigate('/indent-list')}
+                        >
+                            <span className="button-text">View Previous Indent</span>
+                        </Button>
                         <Button
                             icon={<FileExcelOutlined />}
                             onClick={handleExportToExcel}
