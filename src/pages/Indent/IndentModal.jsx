@@ -237,7 +237,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                     </div>
                 }
                 footer={null}
-                width={500}
+                width={450}
             >
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     {/* Drug Info */}
@@ -254,7 +254,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                         </Space>
                         {drug.remarks && (
                             <div style={{ marginTop: 8 }}>
-                                <Text type="secondary" style={{ fontSize: '12px' }}>
+                                <Text style={{ fontSize: '14px' }}>
                                     {drug.remarks}
                                 </Text>
                             </div>
@@ -264,7 +264,6 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                     {/* Editable Stock Info */}
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            <Text strong>Quick Edit Stock</Text>
                             {hasChanges && (
                                 <Text type="warning" style={{ fontSize: 12 }}>
                                     (unsaved changes)

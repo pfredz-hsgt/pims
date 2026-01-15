@@ -267,7 +267,7 @@ const IndentPage = () => {
             key: 'remarks',
             ellipsis: true,
             render: (text) => (
-                <Text type="secondary" style={{ fontSize: '12px' }}>{text}</Text>
+                <Text style={{ fontSize: '14px' }}>{text}</Text>
             ),
         },
     ];

@@ -424,9 +424,9 @@ const CartPage = () => {
             });
 
             if (exportCount > 0) {
-                message.success(`Successfully processed ${exportCount} PDF file(s)!`);
+                message.success(`Successfully downloaded ${exportCount} PDF file(s)!`);
             } else {
-                message.warning('No items to open/download.');
+                message.warning('No items to preview/download.');
             }
         } catch (error) {
             console.error('Error exporting to PDF:', error);
@@ -592,6 +592,7 @@ const CartPage = () => {
                                 color: totalItems === 0 ? undefined : '#fff'
                             }}
                         >
+                            <span className="button-text">Download</span>
                         </Button>
 
                         <Button
@@ -607,6 +608,7 @@ const CartPage = () => {
                                 color: totalItems === 0 ? undefined : '#fff'
                             }}
                         >
+                            <span className="button-text">Clear All</span>
                         </Button>
                     </Space>
                 </div>
@@ -618,7 +620,7 @@ const CartPage = () => {
 
                 {/* Grouped Items */}
                 {totalItems > 0 && (
-                    <Collapse defaultActiveKey={['IPD', 'OPD', 'MFG']}>
+                    <Collapse>
                         {Object.entries(groupedItems).map(([source, items]) => {
                             if (items.length === 0) return null;
 
@@ -682,7 +684,7 @@ const CartPage = () => {
                 open={editingItem !== null}
                 onCancel={handleCloseEdit}
                 centered
-                width={400}
+                width={450}
                 footer={null}
             >
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -705,7 +707,6 @@ const CartPage = () => {
                     {/* Editable Stock Info */}
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            <Text strong>Quick Edit</Text>
                             {hasChanges && (
                                 <Text type="warning" style={{ fontSize: 12 }}>
                                     (unsaved changes)

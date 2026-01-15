@@ -429,7 +429,7 @@ const IndentListPage = () => {
 
                 {/* Grouped Items */}
                 {totalItems > 0 && (
-                    <Collapse defaultActiveKey={['IPD', 'OPD', 'MFG']}>
+                    <Collapse>
                         {Object.entries(groupedItems).map(([source, items]) => {
                             if (items.length === 0) return null;
 
