@@ -9,6 +9,7 @@ import {
     MenuOutlined,
     PushpinOutlined,
     WarningOutlined,
+    HistoryOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -40,6 +41,11 @@ const MainLayout = () => {
             key: '/cart',
             icon: <ShoppingCartOutlined />,
             label: 'Cart',
+        },
+        {
+            key: '/indent-list',
+            icon: <HistoryOutlined />,
+            label: 'Previous Indents',
         },
         {
             key: '/shortexp',
@@ -99,7 +105,7 @@ const MainLayout = () => {
                         marginTop: '4px',
                         fontWeight: 400
                     }}>
-                        ED Pharmacy<br />Inventory aXcess
+                        ED Pharmacy<br />Inventory eXchange
                     </Typography.Text>
                 </div>
                 <Menu

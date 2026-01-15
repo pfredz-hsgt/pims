@@ -66,14 +66,6 @@ h1 {
   color: #888;
 }
 
-.ant-picker-input {
-  cursor: pointer !important;
-}
-
-.readonly-datepicker.ant-picker-large .ant-picker-input>input {
-  cursor: pointer !important;
-  user-select: none;
-}
 
 button {
   border-radius: 8px;
