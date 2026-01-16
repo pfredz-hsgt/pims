@@ -434,6 +434,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                             <Select.Option value="Syrup">Syrup</Select.Option>
                             <Select.Option value="Others">Others</Select.Option>
                             <Select.Option value="UOD">UOD</Select.Option>
+                            <Select.Option value="Non-Drug">Non-Drug</Select.Option>
                         </Select>
                     </Form.Item>
 

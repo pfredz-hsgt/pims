@@ -151,6 +151,7 @@ const InventoryTable = () => {
                 { text: 'Syrup', value: 'Syrup' },
                 { text: 'Others', value: 'Others' },
                 { text: 'UOD', value: 'UOD' },
+                { text: 'Non-Drug', value: 'Non-Drug' },
             ],
             onFilter: (value, record) => record.type === value,
             width: 120,
@@ -325,6 +326,7 @@ const InventoryTable = () => {
                             <Select.Option value="Syrup">Syrup</Select.Option>
                             <Select.Option value="Others">Others</Select.Option>
                             <Select.Option value="UOD">UOD</Select.Option>
+                            <Select.Option value="Non-Drug">Non-Drug</Select.Option>
                         </Select>
                     </Form.Item>
 

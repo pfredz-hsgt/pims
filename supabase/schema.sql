@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS inventory_items (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
-  type TEXT CHECK (type IN ('OPD', 'Eye/Ear/Nose/Inh', 'DDA', 'External', 'Injection', 'Syrup', 'Others', 'UOD')),
+  type TEXT CHECK (type IN ('OPD', 'Eye/Ear/Nose/Inh', 'DDA', 'External', 'Injection', 'Syrup', 'Others', 'UOD', 'Non-Drug')),
   section TEXT NOT NULL,
   row TEXT NOT NULL,
   bin TEXT NOT NULL,

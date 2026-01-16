@@ -11,6 +11,7 @@ export const getTypeColor = (type) => {
         'Syrup': 'purple',
         'Others': 'default',
         'UOD': 'orange',
+        'Non-Drug': 'geekblue',
     };
     return colors[type] || 'default';
 };
