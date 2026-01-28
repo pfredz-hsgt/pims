@@ -629,19 +629,19 @@ const CartPage = () => {
                                     header={
                                         <Space>
                                             <span onClick={(e) => e.stopPropagation()}>
-                                            <Checkbox
-                                                checked={selectedSources.includes(source)}
-                                                onChange={(e) => {
-                                                    const checked = e.target.checked;
-                                                    setSelectedSources(prev => checked
-                                                        ? [...prev, source]
-                                                        : prev.filter(s => s !== source)
-                                                    );
-                                                }}
-                                            />
+                                                <Checkbox
+                                                    checked={selectedSources.includes(source)}
+                                                    onChange={(e) => {
+                                                        const checked = e.target.checked;
+                                                        setSelectedSources(prev => checked
+                                                            ? [...prev, source]
+                                                            : prev.filter(s => s !== source)
+                                                        );
+                                                    }}
+                                                />
                                             </span>
                                             <Tag color={getSourceColor(source)}>{source}</Tag>
-                                            <Text>{items.length} {items.length === 1 ? 'item' : 'items'}</Text>
+                                            <Text>{items.length} {items.length === 1 ? 'item' : 'items'}{items.some(i => i.inventory_items?.section === 'Fr') ? ' - including Fridge Items ❄️ ' : ''}</Text>
                                         </Space>
                                     }
                                     key={source}
@@ -657,7 +657,7 @@ const CartPage = () => {
                                                 <List.Item.Meta
                                                     title={
                                                         <Space>
-                                                            <Text strong>{item.inventory_items?.name}</Text>
+                                                            <Text strong>{item.inventory_items?.name}{item.inventory_items?.section === 'Fr' ? ' ❄️' : ''}</Text>
                                                         </Space>
                                                     }
                                                     description={
