@@ -12,6 +12,8 @@ import {
     Badge,
     Button,
     Checkbox,
+    Radio,
+    Input,
 } from 'antd';
 import {
     EnvironmentOutlined,
@@ -34,16 +36,18 @@ const IndentListPage = () => {
     const [selectedDate, setSelectedDate] = useState(dayjs());
     const [datesWithIndents, setDatesWithIndents] = useState([]);
     const [selectedSources, setSelectedSources] = useState([]);
+    const [searchMode, setSearchMode] = useState('date'); // 'date' | 'drug'
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         fetchDatesWithIndents();
     }, []);
 
     useEffect(() => {
-        if (selectedDate) {
+        if (searchMode === 'date' && selectedDate) {
             fetchIndentItems();
         }
-    }, [selectedDate]);
+    }, [selectedDate, searchMode]);
 
     useEffect(() => {
         groupItemsBySource();
@@ -94,6 +98,31 @@ const IndentListPage = () => {
         } catch (error) {
             console.error('Error fetching indent items:', error);
             message.error('Failed to load indent items');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchIndentItemsByDrug = async (term) => {
+        if (!term) return;
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('indent_requests')
+                .select(`
+          *,
+          inventory_items!inner (*)
+        `)
+                .eq('status', 'Approved')
+                .ilike('inventory_items.name', `%${term}%`)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            setIndentItems(data || []);
+        } catch (error) {
+            console.error('Error searching indent items:', error);
+            message.error('Failed to search indent items');
         } finally {
             setLoading(false);
         }
@@ -364,67 +393,108 @@ const IndentListPage = () => {
                 </div>
 
                 {/* Date Selector */}
-                <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: 300, marginBottom: 8, }}>
-                        <Text strong>Select Date:</Text>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                            <Badge dot color="#1890ff" /> Dates with indent records
-                        </Text>
-                    </div>
+                {/* Search Mode Selector */}
+                <div style={{ marginBottom: 16 }}>
+                    <Radio.Group value={searchMode} onChange={e => {
+                        setSearchMode(e.target.value);
+                        setIndentItems([]); // Clear results on switch
+                        setSearchTerm('');
+                    }}
+                        buttonStyle="solid"
+                    >
+                        <Radio.Button value="date">Search by Date</Radio.Button>
+                        <Radio.Button value="drug">Search by Drug Name</Radio.Button>
+                    </Radio.Group>
+                </div>
 
-                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                        <DatePicker
-                            value={selectedDate}
-                            onChange={(date) => setSelectedDate(date || dayjs())}
-                            format="DD/MM/YYYY"
-                            size="large"
-                            cellRender={dateFullCellRender}
-                            inputReadOnly
-                            style={{
-                                width: '100%', maxWidth: 300, flex: '0 1 auto', cursor: 'pointer'
+                {/* Date Selector */}
+                {searchMode === 'date' ? (
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: 300, marginBottom: 8, }}>
+                            <Text strong>Select Date:</Text>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                <Badge dot color="#1890ff" /> Dates with indent records
+                            </Text>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                            <DatePicker
+                                value={selectedDate}
+                                onChange={(date) => setSelectedDate(date || dayjs())}
+                                format="DD/MM/YYYY"
+                                size="large"
+                                cellRender={dateFullCellRender}
+                                inputReadOnly
+                                style={{
+                                    width: '100%', maxWidth: 300, flex: '0 1 auto', cursor: 'pointer'
+                                }}
+                            />
+                            <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                                <Button
+                                    icon={<EyeOutlined style={{ fontSize: 24 }} />}
+                                    onClick={() => processPDFExport('preview')}
+                                    disabled={totalItems === 0}
+                                    size="large"
+                                    style={{
+                                        backgroundColor: totalItems === 0 ? undefined : '#9c0888ff',
+                                        borderColor: totalItems === 0 ? '#d6d6d6' : '#9c0888ff',
+                                        color: totalItems === 0 ? undefined : '#fff'
+                                    }}
+                                >
+                                </Button>
+                                <Button
+                                    icon={<DownOutlined style={{ fontSize: 19 }} />}
+                                    onClick={() => processPDFExport('download')}
+                                    disabled={totalItems === 0}
+                                    size="large"
+                                    style={{
+                                        backgroundColor: totalItems === 0 ? undefined : '#0050b3',
+                                        borderColor: totalItems === 0 ? '#d6d6d6' : '#0050b3',
+                                        color: totalItems === 0 ? undefined : '#fff'
+                                    }}
+                                >
+                                    <span className="button-text">Download</span>
+                                </Button>
+                            </div>
+                        </div>
+
+                    </div>
+                ) : (
+                    /* Drug Search */
+                    <div style={{ maxWidth: 400 }}>
+                        <div style={{ marginBottom: 8 }}>
+                            <Text strong>Search by Drug Name:</Text>
+                        </div>
+                        <Input.Search
+                            placeholder="Enter drug name (e.g. Paracetamol)"
+                            onSearch={(val) => {
+                                setSearchTerm(val);
+                                fetchIndentItemsByDrug(val);
                             }}
+                            enterButton="Search"
+                            size="large"
+                            allowClear
                         />
-                        <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
-                            <Button
-                                icon={<EyeOutlined style={{ fontSize: 24 }} />}
-                                onClick={() => processPDFExport('preview')}
-                                disabled={totalItems === 0}
-                                size="large"
-                                style={{
-                                    backgroundColor: totalItems === 0 ? undefined : '#9c0888ff',
-                                    borderColor: totalItems === 0 ? '#d6d6d6' : '#9c0888ff',
-                                    color: totalItems === 0 ? undefined : '#fff'
-                                }}
-                            >
-                            </Button>
-                            <Button
-                                icon={<DownOutlined style={{ fontSize: 19 }} />}
-                                onClick={() => processPDFExport('download')}
-                                disabled={totalItems === 0}
-                                size="large"
-                                style={{
-                                    backgroundColor: totalItems === 0 ? undefined : '#0050b3',
-                                    borderColor: totalItems === 0 ? '#d6d6d6' : '#0050b3',
-                                    color: totalItems === 0 ? undefined : '#fff'
-                                }}
-                            >
-                                <span className="button-text">Download</span>
-                            </Button>
+                        <div style={{ marginTop: 8 }}>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                Searches across all historical records
+                            </Text>
                         </div>
                     </div>
-
-                </div>
+                )}
 
 
 
                 {/* Results Count */}
-                <Text type="secondary">
-                    {totalItems} {totalItems === 1 ? 'item' : 'items'} on {selectedDate.format('DD/MM/YYYY')}
-                </Text>
+                {indentItems.length > 0 && (
+                    <Text type="secondary">
+                        {totalItems} {totalItems === 1 ? 'item' : 'items'} found {searchMode === 'date' ? `on ${selectedDate.format('DD/MM/YYYY')}` : `for "${searchTerm || 'search'}"`}
+                    </Text>
+                )}
 
                 {/* Empty State */}
-                {totalItems === 0 && (
-                    <Empty description="No indent records for this date" />
+                {totalItems === 0 && !loading && (
+                    <Empty description={searchMode === 'date' ? "No indent records for this date" : "No records found"} />
                 )}
 
                 {/* Grouped Items */}
@@ -479,7 +549,7 @@ const IndentListPage = () => {
                                                                 </Space>
                                                             </Space>
                                                             <Text>Quantity: <Text strong>{item.requested_qty}</Text></Text>
-                                                            <Text type="secondary" style={{ fontSize: 11 }}>
+                                                            <Text type="primary" style={{ fontStyle: 'italic', fontSize: 13 }}>
                                                                 Requested: {dayjs(item.created_at).format('DD/MM/YYYY HH:mm')}
                                                             </Text>
                                                         </Space>

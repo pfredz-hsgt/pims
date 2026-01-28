@@ -620,7 +620,7 @@ const CartPage = () => {
 
                 {/* Grouped Items */}
                 {totalItems > 0 && (
-                    <Collapse>
+                    <Collapse defaultActiveKey={['OPD Counter', 'Manufact']}>
                         {Object.entries(groupedItems).map(([source, items]) => {
                             if (items.length === 0) return null;
 
@@ -650,8 +650,9 @@ const CartPage = () => {
                                         dataSource={items}
                                         renderItem={(item) => (
                                             <List.Item
+                                                className="clickable-list-item"
                                                 actions={window.innerWidth > 768 ? renderItemActions(item) : undefined}
-                                                style={{ flexWrap: 'wrap', cursor: 'pointer' }}
+                                                style={{ flexWrap: 'wrap', cursor: 'pointer', paddingLeft: '32px' }}
                                                 onClick={() => handleEdit(item)}
                                             >
                                                 <List.Item.Meta
@@ -773,10 +774,11 @@ const CartPage = () => {
                                 >
                                     <Select.Option value="OPD Counter">OPD Counter</Select.Option>
                                     <Select.Option value="OPD Substore">OPD Substore</Select.Option>
-                                    <Select.Option value="IPD Counter">IPD Counter</Select.Option>
-                                    <Select.Option value="MNF Substor">MNF Substor</Select.Option>
-                                    <Select.Option value="Manufact">Manufact</Select.Option>
+                                    <Select.Option value="MNF Substor/Drip">MNF Substor/Drip</Select.Option>
+                                    <Select.Option value="MNF External">MNF External</Select.Option>
+                                    <Select.Option value="MNF Internal">MNF Internal</Select.Option>
                                     <Select.Option value="Prepacking">Prepacking</Select.Option>
+                                    <Select.Option value="IPD Counter">IPD Counter</Select.Option>
                                     <Select.Option value="IPD Substore">IPD Substore</Select.Option>
                                 </Select>
                             </Col>
@@ -816,6 +818,15 @@ const CartPage = () => {
 
             {/* Responsive Styles */}
             <style>{`
+
+                .clickable-list-item:hover {
+                    background-color: #f1fbff;
+                }
+
+                .ant-collapse-body {
+                    padding: 0 !important;
+                }
+
                 /* Excel button styling */
                 .ant-btn:has(.anticon-file-excel) {
                     transition: all 0.3s ease;

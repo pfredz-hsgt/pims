@@ -16,6 +16,7 @@ import {
     DatePicker,
     Row,
     Col,
+    Drawer,
 } from 'antd';
 import { EnvironmentOutlined, EditOutlined, FormOutlined } from '@ant-design/icons';
 import { supabase } from '../../lib/supabase';
@@ -27,7 +28,7 @@ import CustomDateInput from '../../components/CustomDateInput';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
+const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate, width = 500 }) => {
     const [form] = Form.useForm();
     const [editForm] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -217,12 +218,12 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
 
     return (
         <>
-            <Modal
+            <Drawer
                 open={visible}
-                onCancel={handleClose}
-                destroyOnHidden
+                onClose={handleClose}
+                destroyOnClose
+                mask={false}
                 zIndex={1000}
-                centered
                 title={
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
                         <span>Add to Indent Cart</span>
@@ -237,7 +238,8 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                     </div>
                 }
                 footer={null}
-                width={450}
+                width={width}
+                placement="right"
             >
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     {/* Drug Info - Styled like the target example */}
@@ -333,10 +335,11 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                                 >
                                     <Select.Option value="OPD Counter">OPD Counter</Select.Option>
                                     <Select.Option value="OPD Substore">OPD Substore</Select.Option>
-                                    <Select.Option value="IPD Counter">IPD Counter</Select.Option>
-                                    <Select.Option value="MNF Substor">MNF Substor</Select.Option>
-                                    <Select.Option value="Manufact">Manufact</Select.Option>
+                                    <Select.Option value="MNF Substor/Drip">MNF Substor/Drip</Select.Option>
+                                    <Select.Option value="MNF External">MNF External</Select.Option>
+                                    <Select.Option value="MNF Internal">MNF Internal</Select.Option>
                                     <Select.Option value="Prepacking">Prepacking</Select.Option>
+                                    <Select.Option value="IPD Counter">IPD Counter</Select.Option>
                                     <Select.Option value="IPD Substore">IPD Substore</Select.Option>
                                 </Select>
                             </Col>
@@ -413,7 +416,7 @@ const IndentModal = ({ drug, visible, onClose, onSuccess, onDrugUpdate }) => {
                         </Form.Item>
                     </Form>
                 </Space>
-            </Modal>
+            </Drawer>
             {/* Edit Drug Modal */}
             <Modal
                 title="Edit Drug Details"

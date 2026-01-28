@@ -21,8 +21,9 @@ export const getSourceColor = (source) => {
         'OPD Counter': 'green',
         'OPD Substore': 'lime',
         'IPD Counter': 'blue',
-        'MNF Substor': 'orange',
-        'Manufact': 'gold',
+        'MNF Substor/Drip': 'orange',
+        'MNF External': 'red',
+        'MNF Internal': 'turquoise',
         'Prepacking': 'purple',
         'IPD Substore': 'cyan',
     };

@@ -14,11 +14,23 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   row TEXT NOT NULL,
   bin TEXT NOT NULL,
   location_code TEXT GENERATED ALWAYS AS (section || '-' || row || '-' || bin) STORED,
-  min_qty INTEGER DEFAULT 0,
-  max_qty INTEGER,
-  indent_source TEXT CHECK (indent_source IN ('OPD Counter', 'OPD Substore', 'IPD Counter', 'MNF Substor', 'Manufact', 'Prepacking', 'IPD Substore')),
+  -- Note: The migration to TEXT for min/max qty is reflected here as per your previous migration steps
+  min_qty TEXT, 
+  max_qty TEXT,
+  indent_source TEXT CHECK (indent_source IN (
+      'OPD Counter', 
+      'OPD Substore', 
+      'IPD Counter', 
+      'MNF Substor/Drip', 
+      'MNF External', 
+      'MNF Internal', 
+      'Prepacking', 
+      'IPD Substore'
+  )),
   remarks TEXT,
   image_url TEXT,
+  is_short_exp BOOLEAN DEFAULT false,
+  short_exp DATE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

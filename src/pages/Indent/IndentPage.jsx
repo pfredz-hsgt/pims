@@ -14,6 +14,7 @@ import {
     Tag,
     Select,
     Table,
+    Grid,
 } from 'antd';
 import {
     SearchOutlined,
@@ -29,8 +30,13 @@ import IndentModal from './IndentModal';
 import DebouncedSearchInput from '../../components/DebouncedSearchInput';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
+
+const DRAWER_WIDTH = 500;
 
 const IndentPage = () => {
+    const screens = useBreakpoint();
+    const isDesktop = screens.lg; // Consider lg and above as desktop for side-by-side view
     const [drugs, setDrugs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedSection, setSelectedSection] = useState('ALL'); // 'ALL' or a specific section
@@ -196,7 +202,7 @@ const IndentPage = () => {
             dataIndex: 'name',
             key: 'name',
             sorter: (a, b) => a.name.localeCompare(b.name),
-            width: 500,
+            width: 400,
             render: (text, record) => (
                 <Space direction="vertical" size={0}>
                     <Text strong>{text}</Text>
@@ -244,7 +250,6 @@ const IndentPage = () => {
             dataIndex: 'min_qty',
             key: 'min_qty',
             width: 120,
-            responsive: ['md'],
             align: 'center',
         },
         {
@@ -252,7 +257,6 @@ const IndentPage = () => {
             dataIndex: 'max_qty',
             key: 'max_qty',
             width: 120,
-            responsive: ['md'],
             align: 'center',
         },
         {
@@ -278,7 +282,10 @@ const IndentPage = () => {
     ];
 
     return (
-        <div>
+        <div style={{
+            marginRight: (modalVisible && isDesktop) ? DRAWER_WIDTH : 0,
+            transition: 'margin-right 0.3s ease',
+        }}>
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 {/* Header */}
                 <div>
@@ -532,6 +539,7 @@ const IndentPage = () => {
             <IndentModal
                 drug={selectedDrug}
                 visible={modalVisible}
+                width={DRAWER_WIDTH}
                 onClose={(shouldRefresh) => {
                     setModalVisible(false);
                     if (shouldRefresh) {

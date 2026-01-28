@@ -179,12 +179,14 @@ const InventoryTable = () => {
             title: 'Source',
             dataIndex: 'indent_source',
             key: 'indent_source',
+            sorter: (a, b) => a.indent_source.localeCompare(b.indent_source),
             filters: [
                 { text: 'OPD Counter', value: 'OPD Counter' },
                 { text: 'OPD Substore', value: 'OPD Substore' },
                 { text: 'IPD Counter', value: 'IPD Counter' },
-                { text: 'MNF Substor', value: 'MNF Substor' },
-                { text: 'Manufact', value: 'Manufact' },
+                { text: 'MNF Substor/Drip', value: 'MNF Substor/Drip' },
+                { text: 'MNF External', value: 'MNF External' },
+                { text: 'MNF Internal', value: 'MNF Internal' },
                 { text: 'Prepacking', value: 'Prepacking' },
                 { text: 'IPD Substore', value: 'IPD Substore' },
             ],
@@ -371,10 +373,11 @@ const InventoryTable = () => {
                         <Select placeholder="Select source">
                             <Select.Option value="OPD Counter">OPD Counter</Select.Option>
                             <Select.Option value="OPD Substore">OPD Substore</Select.Option>
-                            <Select.Option value="IPD Counter">IPD Counter</Select.Option>
-                            <Select.Option value="MNF Substor">MNF Substor</Select.Option>
-                            <Select.Option value="Manufact">Manufact</Select.Option>
+                            <Select.Option value="MNF Substor/Drip">MNF Substor/Drip</Select.Option>
+                            <Select.Option value="MNF External">MNF External</Select.Option>
+                            <Select.Option value="MNF Internal">MNF Internal</Select.Option>
                             <Select.Option value="Prepacking">Prepacking</Select.Option>
+                            <Select.Option value="IPD Counter">IPD Counter</Select.Option>
                             <Select.Option value="IPD Substore">IPD Substore</Select.Option>
                         </Select>
                     </Form.Item>
