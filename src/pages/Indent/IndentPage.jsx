@@ -48,7 +48,12 @@ const IndentPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(24);
     const [searchQuery, setSearchQuery] = useState('');
-    const [viewMode, setViewMode] = useState('table'); // 'grid' or 'list' or 'table'
+    const [viewMode, setViewMode] = useState(isDesktop ? 'table' : 'list');
+
+    useEffect(() => {
+        setViewMode(isDesktop ? 'table' : 'list');
+    }, [isDesktop]);
+
 
     useEffect(() => {
         fetchDrugs();
