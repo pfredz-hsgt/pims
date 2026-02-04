@@ -435,6 +435,7 @@ const IndentListPage = () => {
                                     onClick={() => processPDFExport('preview')}
                                     disabled={totalItems === 0}
                                     size="large"
+                                    className="custom-hover-btn"
                                     style={{
                                         backgroundColor: totalItems === 0 ? undefined : '#9c0888ff',
                                         borderColor: totalItems === 0 ? '#d6d6d6' : '#9c0888ff',
@@ -447,6 +448,7 @@ const IndentListPage = () => {
                                     onClick={() => processPDFExport('download')}
                                     disabled={totalItems === 0}
                                     size="large"
+                                    className="custom-hover-btn"
                                     style={{
                                         backgroundColor: totalItems === 0 ? undefined : '#0050b3',
                                         borderColor: totalItems === 0 ? '#d6d6d6' : '#0050b3',
@@ -607,6 +609,16 @@ const IndentListPage = () => {
                 /* Date picker badge styling */
                 .ant-picker-cell-inner .ant-badge {
                     width: 100%;
+                }
+
+                .custom-hover-btn {
+                    transition: all 0.3s ease !important;
+                }
+
+                .custom-hover-btn:hover:not(:disabled) {
+                    transform: translateY(-1px);
+                    filter: brightness(1.5);
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
                 }
             `}</style >
         </div >

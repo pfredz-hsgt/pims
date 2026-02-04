@@ -216,10 +216,29 @@ const CartPage = () => {
     };
 
     const handleApproveIndent = async () => {
+        if (selectedSources.length === 0) {
+            message.warning('Please select at least one source to clear');
+            return;
+        }
+
         try {
+            // Filter items that belong to selected sources
+            const itemsToApprove = cartItems.filter(item => {
+                const source = item.inventory_items?.indent_source || 'OPD';
+                return selectedSources.includes(source);
+            });
+
+            if (itemsToApprove.length === 0) {
+                message.warning('No pending items found for the selected sources');
+                return;
+            }
+
+            const idsToApprove = itemsToApprove.map(item => item.id);
+
             const { error } = await supabase
                 .from('indent_requests')
                 .update({ status: 'Approved' })
+                .in('id', idsToApprove)
                 .eq('status', 'Pending');
 
             if (error) throw error;
@@ -573,6 +592,7 @@ const CartPage = () => {
                             disabled={totalItems === 0}
                             tooltip={<span>Preview</span>}
                             size="large"
+                            className="custom-hover-btn"
                             style={{
                                 backgroundColor: totalItems === 0 ? undefined : '#b8008aff ',
                                 borderColor: totalItems === 0 ? '#d6d6d6' : '#b8008aff ',
@@ -586,6 +606,7 @@ const CartPage = () => {
                             disabled={totalItems === 0}
                             tooltip={<span>Download</span>}
                             size="large"
+                            className="custom-hover-btn"
                             style={{
                                 backgroundColor: totalItems === 0 ? undefined : '#0050b3 ',
                                 borderColor: totalItems === 0 ? '#d6d6d6' : '#0050b3 ',
@@ -600,15 +621,16 @@ const CartPage = () => {
                             icon={<DeleteOutlined style={{ fontSize: 19 }} />}
                             onClick={handleApproveIndent}
                             disabled={totalItems === 0}
-                            tooltip={<span>Clear All</span>}
+                            tooltip={<span>Clear</span>}
                             size="large"
+                            className="custom-hover-btn"
                             style={{
                                 backgroundColor: totalItems === 0 ? undefined : '#cf1322 ',
                                 borderColor: totalItems === 0 ? '#d6d6d6' : '#cf1322 ',
                                 color: totalItems === 0 ? undefined : '#fff'
                             }}
                         >
-                            <span className="button-text">Clear All</span>
+                            <span className="button-text">Clear</span>
                         </Button>
                     </Space>
                 </div>
@@ -620,7 +642,18 @@ const CartPage = () => {
 
                 {/* Grouped Items */}
                 {totalItems > 0 && (
-                    <Collapse defaultActiveKey={['OPD Counter', 'Manufact']}>
+                    <Collapse
+                        defaultActiveKey={[
+                            'OPD Counter',
+                            'OPD Substore',
+                            'MNF Substor/Drip',
+                            'MNF External',
+                            'MNF Internal',
+                            'Prepacking',
+                            'IPD Counter',
+                            'IPD Substore',
+                        ]}
+                    >
                         {Object.entries(groupedItems).map(([source, items]) => {
                             if (items.length === 0) return null;
 
@@ -821,6 +854,16 @@ const CartPage = () => {
 
                 .clickable-list-item:hover {
                     background-color: #f1fbff;
+                }
+
+                .custom-hover-btn {
+                    transition: all 0.3s ease !important;
+                }
+
+                .custom-hover-btn:hover:not(:disabled) {
+                    transform: translateY(-1px);
+                    filter: brightness(1.5);
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
                 }
 
                 .ant-collapse-body {
