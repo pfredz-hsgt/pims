@@ -57,15 +57,15 @@ const IndentListPage = () => {
         try {
             const { data, error } = await supabase
                 .from('indent_requests')
-                .select('created_at')
+                .select('updated_at')
                 .eq('status', 'Approved')
-                .order('created_at', { ascending: false });
+                .order('updated_at', { ascending: false });
 
             if (error) throw error;
 
             // Extract unique dates
             const uniqueDates = [...new Set(
-                data.map(item => dayjs(item.created_at).format('YYYY-MM-DD'))
+                data.map(item => dayjs(item.updated_at).format('YYYY-MM-DD'))
             )];
 
             setDatesWithIndents(uniqueDates);
@@ -88,9 +88,9 @@ const IndentListPage = () => {
           inventory_items (*)
         `)
                 .eq('status', 'Approved')
-                .gte('created_at', startOfDay)
-                .lte('created_at', endOfDay)
-                .order('created_at', { ascending: false });
+                .gte('updated_at', startOfDay)
+                .lte('updated_at', endOfDay)
+                .order('updated_at', { ascending: false });
 
             if (error) throw error;
 
@@ -115,7 +115,7 @@ const IndentListPage = () => {
         `)
                 .eq('status', 'Approved')
                 .ilike('inventory_items.name', `%${term}%`)
-                .order('created_at', { ascending: false });
+                .order('updated_at', { ascending: false });
 
             if (error) throw error;
 
