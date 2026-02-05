@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { Input } from 'antd';
 
-const DebouncedSearchInput = ({ onSearch, delay = 300, value: parentValue, ...props }) => {
+const DebouncedSearchInput = forwardRef(({ onSearch, delay = 300, value: parentValue, ...props }, ref) => {
     const [localValue, setLocalValue] = useState(parentValue || '');
 
     // Sync with parent value if it changes (optional, but good for controlled behavior if needed)
@@ -28,10 +28,11 @@ const DebouncedSearchInput = ({ onSearch, delay = 300, value: parentValue, ...pr
     return (
         <Input
             {...props}
+            ref={ref}
             value={localValue}
             onChange={handleChange}
         />
     );
-};
+});
 
 export default DebouncedSearchInput;

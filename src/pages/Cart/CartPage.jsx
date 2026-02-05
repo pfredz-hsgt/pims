@@ -26,7 +26,9 @@ import {
     EyeOutlined,
     DownOutlined,
     DeleteOutlined,
+    PlusOutlined,
 } from '@ant-design/icons';
+import QuickAddModal from './QuickAddModal';
 import { supabase } from '../../lib/supabase';
 import { getTypeColor, getSourceColor } from '../../lib/colorMappings';
 import * as XLSX from 'xlsx';
@@ -43,6 +45,7 @@ const CartPage = () => {
     const [groupedItems, setGroupedItems] = useState({});
     const [editingItem, setEditingItem] = useState(null);
     const [editQuantity, setEditQuantity] = useState('');
+    const [quickAddVisible, setQuickAddVisible] = useState(false);
     const [editMinQty, setEditMinQty] = useState('');
     const [editMaxQty, setEditMaxQty] = useState('');
     const [editIndentSource, setEditIndentSource] = useState('');
@@ -562,7 +565,24 @@ const CartPage = () => {
                     gap: '16px'
                 }}>
                     <div>
-                        <Title level={3} style={{ margin: 0 }}>Indent Cart</Title>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Title level={3} style={{ margin: 0 }}>Indent Cart</Title>
+                            <Button
+                                type="primary"
+                                shape="circle"
+                                icon={<PlusOutlined />}
+                                size="small"
+                                onClick={() => setQuickAddVisible(true)}
+                                tooltip="Quick Add Item"
+                                style={{
+                                    backgroundColor: '#52c41a',
+                                    borderColor: '#52c41a',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            />
+                        </div>
                         <Text type="secondary">
                             {totalItems} {totalItems === 1 ? 'item' : 'items'} in cart
                         </Text>
@@ -848,6 +868,15 @@ const CartPage = () => {
                     </div>
                 </Space>
             </Modal>
+
+            <QuickAddModal
+                visible={quickAddVisible}
+                onClose={() => setQuickAddVisible(false)}
+                onSuccess={() => {
+                    fetchCartItems();
+                    setQuickAddVisible(false);
+                }}
+            />
 
             {/* Responsive Styles */}
             <style>{`
