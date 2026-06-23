@@ -8,7 +8,9 @@ import ShortExpPage from './pages/Shortexp/ShortExpPage';
 import CartPage from './pages/Cart/CartPage';
 import IndentListPage from './pages/Cart/IndentListPage';
 import SettingsPage from './pages/Settings/SettingsPage';
+import ConfigPage from './pages/Config/ConfigPage';
 import FloorPlanApp from './pages/Floorplan/FloorPlanApp';
+import Test from './pages/Test/Test';
 
 function App() {
     return (
@@ -32,6 +34,8 @@ function App() {
                     <Route path="cart" element={<CartPage />} />
                     <Route path="indent-list" element={<IndentListPage />} />
                     <Route path="settings" element={<SettingsPage />} />
+                    <Route path="config" element={<ConfigPage />} />
+                    <Route path="test" element={<Test />} />
                 </Route>
             </Routes>
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 87.11 64.53">
+  <g id="M15-S8">
+    <g id="M1">
+      <polygon id="outline" points="85.1 .12 2.01 .12 .05 .12 .05 30.7 3.18 36.58 3.18 49.51 4.75 64.41 82.36 64.41 83.93 49.51 83.93 36.58 87.06 30.7 87.06 .12 85.1 .12" style="fill: #4d4d4d;"/>
+      <polygon points="87.06 .12 87.06 30.7 83.93 36.58 83.93 49.51 3.18 49.51 3.18 36.58 .05 30.7 .05 .12 2.01 .12 2.01 1.69 5.54 1.69 5.54 30.31 81.58 30.31 81.58 1.69 85.1 1.69 85.1 .12 87.06 .12" style="fill: #ffeb00; stroke: #603813; stroke-miterlimit: 10; stroke-width: .1px;"/>
+      <polygon points="83.93 49.51 82.36 64.41 4.75 64.41 3.18 49.51 83.93 49.51" style="fill: #cfb007; stroke: #ceaf07; stroke-miterlimit: 10; stroke-width: .25px;"/>
+      <polygon points="74.72 30.11 74.72 31.29 71.19 31.29 71.19 46.18 16.32 46.18 16.32 31.29 12.79 31.29 12.79 30.11 74.72 30.11" style="fill: #f4dc00; stroke: #f2e860; stroke-miterlimit: 10; stroke-width: .36px;"/>
+      <polygon points="85.1 .12 85.1 1.69 81.58 1.69 81.58 30.31 5.54 30.31 5.54 1.69 2.01 1.69 2.01 .12 85.1 .12" style="fill: #9a7206; stroke: gray; stroke-miterlimit: 10; stroke-width: .25px;"/>
+    </g>
+  </g>
+</svg>

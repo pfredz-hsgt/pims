@@ -86,3 +86,45 @@ ALTER TABLE inventory_items
 ALTER COLUMN min_qty TYPE TEXT USING min_qty::text,
 ALTER COLUMN min_qty DROP DEFAULT,
 ALTER COLUMN max_qty TYPE TEXT USING max_qty::text;
+
+-- Table: inventory_config
+-- Stores bin locations and configuration
+CREATE TABLE IF NOT EXISTS inventory_config (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  section VARCHAR(2) NOT NULL,
+  row INTEGER NOT NULL,
+  bin_size VARCHAR(1) NOT NULL CHECK (bin_size IN ('S', 'M', 'L')),
+  bin_loc INTEGER NOT NULL,
+  location_code TEXT GENERATED ALWAYS AS (section || '-' || row::TEXT || '-' || bin_size || bin_loc::TEXT) STORED,
+  status VARCHAR(20) DEFAULT 'Active',
+  remarks TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for efficient joins with inventory_items
+CREATE INDEX IF NOT EXISTS idx_inventory_config_location ON inventory_config(location_code);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_inventory_config_updated_at
+  BEFORE UPDATE ON inventory_config
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Table: shelf_templates
+-- Maps a physical section and row to a visual layout template
+CREATE TABLE IF NOT EXISTS shelf_templates (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  section VARCHAR(2) NOT NULL,
+  row INTEGER NOT NULL,
+  template_id TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(section, row)
+);
+
+-- Trigger for updated_at on shelf_templates
+CREATE TRIGGER update_shelf_templates_updated_at
+  BEFORE UPDATE ON shelf_templates
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();

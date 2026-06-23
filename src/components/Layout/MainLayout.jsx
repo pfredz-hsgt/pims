@@ -10,6 +10,8 @@ import {
     PushpinOutlined,
     WarningOutlined,
     HistoryOutlined,
+    AppstoreOutlined,
+    ExperimentOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -56,6 +58,16 @@ const MainLayout = () => {
             key: '/settings',
             icon: <SettingOutlined />,
             label: 'Settings',
+        },
+        {
+            key: '/config',
+            icon: <AppstoreOutlined />,
+            label: 'Config',
+        },
+        {
+            key: '/test',
+            icon: <ExperimentOutlined />,
+            label: 'Test',
         },
     ];
 

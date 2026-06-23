@@ -1,4 +1,4 @@
-# PIMS - Pharmacy Inventory Management System
+# EPIX - ED Pharmacy Inventory aXcess
 
 **Emergency Pharmacy Hospital Segamat**
 

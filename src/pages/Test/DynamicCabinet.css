@@ -1,0 +1,39 @@
+/* DynamicCabinet.css */
+
+/* Add transition to the outline and the group for smooth animations */
+.bin-wrapper svg g,
+.outline {
+  transition: all 0.2s ease-in-out;
+}
+
+/* 1. Add the red drop-shadow glow behind the whole bin 
+.bin-wrapper:hover svg g {
+  filter: drop-shadow(0px 0px 8px #ff0000);
+}*/
+
+/* 2. Apply the red stroke exclusively to the outline shape */
+.bin-wrapper:hover .outline {
+  stroke: #0066ff !important;
+  stroke-width: 6px !important;
+}
+
+/* Optional: Apply a glowing green stroke when it is the active target drug! */
+.target-bin .outline {
+  stroke: #c41a1a !important;
+  stroke-width: 6px !important;
+}
+
+/* Visually distinguish occupied bins (No outline) */
+.occupied-bin .outline {
+  /* No stroke needed for occupied */
+}
+
+/* Visually highlight empty bins */
+.empty-bin {
+  opacity: 0.5;
+}
+
+.empty-bin .outline {
+  stroke: #ff0000 !important;
+  stroke-width: 3px !important;
+}
